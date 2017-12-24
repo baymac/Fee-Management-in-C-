@@ -17,7 +17,7 @@ void help(); // function definition for help
 
 void position(int x, int y) // positions the cursor according to the co-ordinates
 {
-    COORD coord = {x, y};
+    COORD coord = {x, y}; // coord is a structure defined in windows.h
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
