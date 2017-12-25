@@ -70,47 +70,47 @@ void mainmenu()
 
     for (li = 30; li <= 50; li++)
     {
-        position(li, 14);
+        position(li, 5);
         Sleep(30);
         printf("*");
     }
     for (li = 50; li >= 30; li--)
     {
-        position(li, 30);
+        position(li, 21);
         Sleep(30);
         printf("*");
     }
-    for (lp = 15; lp < 30; lp++)
+    for (lp = 6; lp < 21; lp++)
     {
         position(30, lp);
         Sleep(100);
         printf("|");
     }
-    for (lp = 29; lp >= 15; lp--)
+    for (lp = 20; lp >= 6; lp--)
     {
         position(50, lp);
         Sleep(100);
         printf("|");
     }
-    position(15, 10);
+    position(15, 2);
 
     printf("Press the corresponding Keys for the desired action");
-    position(35, 16);
+    position(35, 7);
 
     printf("F: FEE SLIP");
-    position(35, 19);
+    position(35, 10);
 
     printf("M: MODIFY");
-    position(35, 22);
+    position(35, 13);
 
     printf("L: LIST");
-    position(35, 25);
+    position(35, 16);
 
     printf("H: HELP");
-    position(35, 28);
+    position(35, 19);
 
     printf("Q: QUIT");
-    position(35, 30);
+    position(35, 22);
     choice = getch();
     ch = toupper(choice);
     
@@ -132,7 +132,7 @@ void mainmenu()
         exit(0);
         break;
     default:
-        position(33, 40);
+        position(16, 24);
         cout << "Illegal Choice Press any key to return to Main Menu";
         getch();
         mainmenu();
@@ -754,7 +754,7 @@ int main()
 
     for (i = 10; i < 71; i++)
     {
-        position(i, 15);
+        position(i, 5);
         Sleep(30);
         printf("/");
     }
@@ -764,21 +764,21 @@ int main()
     //     Sleep(30);
     //     cout << " / ";
     // }
-    for (j = 16; j <= 21; j++)
+    for (j = 6; j <= 11; j++)
     {
         position(10, j);
         Sleep(100);
         printf("-");
     }
-    for (j = 21; j >= 16; j--)
+    for (j = 11; j >= 6; j--)
     {
         position(70, j);
         Sleep(100);
         printf("-");
     }
-    position(28, 17);
+    position(28, 7);
     printf("Fee Structure System");
-    position(24, 20);
+    position(24, 10);
     printf("Press Any Key To Continue..");
     getch();
     mainmenu();
