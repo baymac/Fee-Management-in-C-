@@ -144,7 +144,7 @@ void mainmenu()
 // FUNCTION TO DRAW HORIZONTAL LINE
 //************************************
 
-void DRAW ::LINE_HOR(int column1, int column2, int row, char c)
+void DRAW::LINE_HOR(int column1, int column2, int row, char c)
 {
     for (column1; column1 <= column2; column1++)
     {
@@ -157,7 +157,7 @@ void DRAW ::LINE_HOR(int column1, int column2, int row, char c)
 // FUNCTION TO DRAW VERTICAL LINE
 //**********************************************************
 
-void DRAW ::LINE_VER(int row1, int row2, int column, char c)
+void DRAW::LINE_VER(int row1, int row2, int column, char c)
 {
     for (row1; row1 <= row2; row1++)
     {
@@ -170,7 +170,7 @@ void DRAW ::LINE_VER(int row1, int row2, int column, char c)
 // FUNCTION TO DRAW BOX LINE
 //**********************************************************
 
-void DRAW ::BOX(int column1, int row1, int column2, int row2, char c)
+void DRAW::BOX(int column1, int row1, int column2, int row2, char c)
 {
     char ch = 218;
     char c1, c2, c3, c4;
@@ -217,23 +217,25 @@ void DRAW ::BOX(int column1, int row1, int column2, int row2, char c)
 // FUNCTION TO ADD FEE STRUCTURE IN FEE FILE
 //**********************************************************
 
-void FEE ::ADDITION(void)
+void FEE::ADDITION(void)
 {
-    fstream file;
-    file.open("FEE.DAT", ios::out | ios::trunc);
-    file.close();
-    file.open("FEE.DAT", ios::in);
-    if (!file.fail())
-        return;
+    ofstream file;
+    // file.open("FEE.TXT", ios::out | ios::trunc);
+    // file.close();
+    file.open("FEE.TXT", ios::trunc);
+    if (file.fail())
+        {cout << "Hello";
+        exit(0);}
+    FEE f;
     for (int i = 1; i <= 12; i++)
     {
-        Class = i;
-        tuition = 756.0;
-        library = 15.0;
-        lab  = 863.0;
-        computer = 8670.0;
-        activity = 964.0;
-        file.write((char *)this, sizeof(FEE));
+        f.Class = i;
+        f.tuition = 756;
+        f.library = 15;
+        f.lab  = 863;
+        f.computer = 867;
+        f.activity = 964;
+        file.write((char*)&f, sizeof(f));
     }
     file.close();
     /*MODIFY_RECORD(12, 450, 50, 60, 60, 50);
@@ -254,7 +256,7 @@ void FEE ::ADDITION(void)
 // FUNCTION TO DISPLAY TOTAL FEE AS LIST
 //**********************************************************
 
-void FEE ::LIST()
+void FEE::LIST()
 {
     system("cls");
     DRAW d;
@@ -269,7 +271,7 @@ void FEE ::LIST()
     float total;
     int row = 8;
     fstream file;
-    file.open("FEE.DAT", ios::in);
+    file.open("FEE.TXT", ios::in);
     while (file.read((char *)this, sizeof(FEE)))
     {
         total = tuition + library + lab  + computer + activity;
@@ -290,10 +292,10 @@ void FEE ::LIST()
 // FUNCTION TO DISPLAY THE RECORD FOR THE GIVEN CLASS
 //**********************************************************
 
-void FEE ::DISPLAY(int tclass)
+void FEE::DISPLAY(int tclass)
 {
     fstream file;
-    file.open("FEE.DAT", ios::in);
+    file.open("FEE.TXT", ios::in);
     while (file.read((char *)this, sizeof(FEE)))
     {
         if (Class == tclass)
@@ -322,10 +324,10 @@ void FEE ::DISPLAY(int tclass)
 // FUNCTION TO MODIFY THE FEE RECORD FOR THE GIVEN DATA
 //**********************************************************
 
-void FEE ::MODIFY_RECORD(int tclass, float ttution, float tlibrary, float tlab, float tcomputer, float tactivity)
+void FEE::MODIFY_RECORD(int tclass, float ttution, float tlibrary, float tlab, float tcomputer, float tactivity)
 {
     fstream file;
-    file.open("FEE.DAT", ios::in);
+    file.open("FEE.TXT", ios::in);
     fstream temp;
     temp.open("temp.dat", ios::out);
     file.seekg(0, ios::beg);
@@ -350,7 +352,7 @@ void FEE ::MODIFY_RECORD(int tclass, float ttution, float tlibrary, float tlab, 
 
     file.close();
     temp.close();
-    file.open("FEE.DAT", ios::out);
+    file.open("FEE.TXT", ios::out);
     temp.open("temp.dat", ios::in);
     temp.seekg(0, ios::beg);
     while (!temp.eof())
@@ -368,7 +370,7 @@ void FEE ::MODIFY_RECORD(int tclass, float ttution, float tlibrary, float tlab, 
 // FUNCTION TO GIVE DATA TO MODIFY THE FEE RECORD
 //**********************************************************
 
-void FEE ::MODIFICATION(void)
+void FEE::MODIFICATION(void)
 {
     system("cls");
     char ch, t1[10];
@@ -426,7 +428,7 @@ void FEE ::MODIFICATION(void)
     cout << "Extra Activity Fee : ";
     int modified = 5;
     fstream file;
-    file.open("FEE.DAT", ios::in);
+    file.open("FEE.TXT", ios::in);
     while (file.read((char *)this, sizeof(FEE)))
         if (Class == tclass)
             break;
@@ -610,7 +612,7 @@ void FEE ::MODIFICATION(void)
 // FUNCTION TO DISPLAY THE FEE SLIP FOR THE CLASS
 //**********************************************************
 
-void FEE ::FEE_SLIP(void)
+void FEE::FEE_SLIP(void)
 {
     system("cls");
 
@@ -655,9 +657,9 @@ void FEE ::FEE_SLIP(void)
     } while (!valid);
     system("cls");
     DRAW d;
-    d.BOX(20, 2, 61, 24, 987);
+    d.BOX(20, 2, 61, 24, 989);
     position(24, 3);
-    cout << "         DAV PUBLIC SCHOOL, BURLA      ";
+    cout << "    DAV PUBLIC SCHOOL, BURLA      ";
     int d1, m1, y1;
     time_t td = time(0);
     struct tm *now = localtime(&td);
@@ -682,7 +684,7 @@ void FEE ::FEE_SLIP(void)
     position(54, 23);
     cout << "CASHIER";
     fstream file;
-    file.open("FEE.DAT", ios::in);
+    file.open("FEE.TXT", ios::in);
 
     while (!file.eof())
     {
@@ -697,19 +699,19 @@ void FEE ::FEE_SLIP(void)
 
     float total = 0.0;
     position(23, 12);
-    cout << "Tuition fees               " << setprecision(2) << tuition;
+    cout << "Tuition fees               "  << tuition;
     total = total + tuition;
     position(23, 13);
-    cout << "Annual charges fees       " << setprecision(2) << library;
+    cout << "Library fees               "  << library;
     total = total + library;
     position(23, 14);
-    cout << "Science fees              " << setprecision(2) << lab ;
+    cout << "Science fees               "  << lab ;
     total = total + lab ;
     position(23, 15);
-    cout << "Computer fees             " << setprecision(2) << computer;
+    cout << "Computer fees              "  << computer;
     total = total + computer;
     position(23, 16);
-    cout << "Activity fees             " << setprecision(2) << activity;
+    cout << "Activity fees              "  << activity;
     total = total + activity;
     d.LINE_VER(9, 21, 46, 179);
     char tt[15];
@@ -717,7 +719,7 @@ void FEE ::FEE_SLIP(void)
     position(49, 21);
     cout << tt;
     position(33, 40);
-    cout << "Press any key to return to the main menu........";
+    cout << "Press any key to return to the main menu..";
     getch();
     mainmenu();
 }
