@@ -365,8 +365,10 @@ void FEE::MODIFICATION(void)
     system("cls");
     position(71, 1);
     cout << "<0> = Exit";
-    cout << "\n<y> = Modify";
-    cout << "\n<n> = Return to Main Menu";
+    position(71, 2);
+    cout << "<y> = Modify";
+    position(71, 3);
+    cout << "<n> = Return to Main Menu";
 
     DISPLAY(tclass);
     f.Class = tclass;
@@ -385,19 +387,18 @@ void FEE::MODIFICATION(void)
         mainmenu();
     
     float ttuition = 0.0, tlibrary = 0.0, tlab  = 0.0, tcomputer = 0.0, tactivity = 0.0;
-    position(5, 13);
     position(5, 17);
     cout << "Tuition Fee : ";
     position(5, 18);
     cout << "Library Fee : ";
     position(5, 19);
-    cout << "Science Practical Fee : ";
+    cout << "Lab Fee : ";
     position(5, 20);
     cout << "Computer Fee : ";
     position(5, 21);
     cout << "Extra Activity Fee : ";
-    int modified = 5;
     
+    int modified = 5;
 
     do
     {
@@ -424,24 +425,20 @@ void FEE::MODIFICATION(void)
 
         if(!valid){
             position(5, 27);
-            cout << "Enter correctly";
+            cout << "Enter correctly                        ";
             getch();
         }
     } while (!valid);
 
-    if (strlen(t1) == 0){
-        modified--;
-        f.tuition  = ttuition;
-        position(19, 19);
-        cout << ttuition;
-    }
+    modified--;
+    f.tuition  = ttuition;
     
     do
     {
         valid = 1;
         position(5, 27);
         cout << "Enter LIBRARY FEE";
-        position(26, 18);
+        position(19, 18);
         gets(t1);
         t2 = atof(t1);
         tlibrary = t2;
@@ -461,25 +458,20 @@ void FEE::MODIFICATION(void)
 
         if(!valid){
             position(5, 27);
-            cout << "Enter correctly";
+            cout << "Enter correctly                        ";
             getch();
         }
     } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        f.library  = tlibrary ;
-        position(19, 19);
-        cout << tlibrary ;
-    }
+    modified--;
+    f.library  = tlibrary;
 
     do
     {
         valid = 1;
         position(5, 27);
         cout << "Enter LAB FEES";
-        position(19, 19);
+        position(15, 19);
         gets(t1);
         t2 = atof(t1);
         tlab  = t2;
@@ -487,7 +479,7 @@ void FEE::MODIFICATION(void)
             return;
         if (strlen(t1) == 0)
             break;
-            
+
         for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
             if(isalpha(*p)){
                 valid = 0;
@@ -499,25 +491,20 @@ void FEE::MODIFICATION(void)
 
         if(!valid){
             position(5, 27);
-            cout << "Enter correctly";
+            cout << "Enter correctly                    ";
             getch();
         }
     } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        f.lab  = tlab ;
-        position(19, 19);
-        cout << tlab ;
-    }
+    modified--;
+    f.lab  = tlab;
 
     do
     {
         valid = 1;
         position(5, 27);
         cout << "Enter COMPUTER FEES";
-        position(19, 20);
+        position(20, 20);
         gets(t1);
         t2 = atof(t1);
         tcomputer = t2;
@@ -544,20 +531,15 @@ void FEE::MODIFICATION(void)
         }
     } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        f.computer = tcomputer;
-        position(19, 20);
-        cout << tcomputer;
-    }
-
+    modified--;
+    f.computer = tcomputer;
+    
     do
     {
         valid = 1;
         position(5, 27);
         cout << "Enter ACTIVITY FEES";
-        position(19, 21);
+        position(26, 21);
         gets(t1);
         t2 = atof(t1);
         tactivity = t2;
@@ -583,17 +565,8 @@ void FEE::MODIFICATION(void)
         }
     } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        f.activity = tactivity;
-        position(19, 21);
-        cout << tactivity;
-    }
-    if (!modified)
-        mainmenu();
-    
-    position(5, 27);
+    modified--;
+    f.activity = tactivity;
 
     do
     {
@@ -608,13 +581,13 @@ void FEE::MODIFICATION(void)
     if (ch == 'N')
         return;
     if (ch == 'Y'){
-
+        fstream file;
+        file.open("FEE.TXT", ios::out);
+        file.seekp((tclass-1)*sizeof(FEE), ios::beg);
+        file.write((char *)&f, sizeof(FEE));
+        file.close();
     }
-    fstream file;
-    file.open("FEE.TXT", ios::out);
-    file.seekg((tclass-1)*sizeof(FEE), ios::beg);
-    file.write((char *)&f, sizeof(FEE));
-    file.close();
+    
     mainmenu();
 }
 
