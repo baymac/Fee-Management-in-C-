@@ -582,10 +582,11 @@ void FEE::MODIFICATION(void)
         return;
     if (ch == 'Y'){
         fstream file;
-        file.open("FEE.TXT", ios::out);
-        file.seekp((tclass-1)*sizeof(FEE), ios::beg);
+        file.open("FEE.TXT", ios::out | ios::in);
+        file.seekp((tclass-1)*sizeof(FEE));
         file.write((char *)&f, sizeof(FEE));
         file.close();
+        getch();
     }
     
     mainmenu();
