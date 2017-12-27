@@ -11,6 +11,8 @@
 #include <ctime>
 #include <dos.h>
 #include <iomanip>
+#include <string>
+
 using namespace std;
 
 void help(); // function definition for help
@@ -27,6 +29,7 @@ void position(int x, int y) // positions the cursor according to the co-ordinate
 
 char ch, choice;
 int i, j, li, lp, rec, valid;
+string clear = "                                       ";
 COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
 
 //**************************** ********
@@ -53,10 +56,11 @@ class FEE
     void DISPLAY(int);
     void MODIFY_RECORD(int, float, float, float, float, float);
 
+
   public:
     void ADDITION(void);
     void MODIFICATION(void);
-    void FEE_SLIP(void);
+    void SLIP(void);
     void LIST(void);
     void HELP(void);
 } fee;
@@ -64,60 +68,76 @@ class FEE
 //****************************************
 //                  MAIN MENU FUNCTION
 //****************************************
-void mainmenu()
+bool firstRun = false;
+void home()
 {
     system("cls");
 
-    for (li = 30; li <= 50; li++)
+    position(53, 3);
+    printf("HOME");
+
+    for (li = 45; li <= 65; li++)
     {
         position(li, 5);
-        Sleep(30);
+        if(!firstRun) {
+            // Sleep(30);
+        }
         printf("*");
     }
-    for (li = 50; li >= 30; li--)
+    for (li = 65; li >= 45; li--)
     {
         position(li, 21);
-        Sleep(30);
+        if(!firstRun) {
+            // Sleep(30);
+        }
         printf("*");
     }
     for (lp = 6; lp < 21; lp++)
     {
-        position(30, lp);
-        Sleep(100);
+        position(45, lp);
+        if(!firstRun) {
+            // Sleep(100);
+        }
         printf("|");
     }
     for (lp = 20; lp >= 6; lp--)
     {
-        position(50, lp);
-        Sleep(100);
+        position(65, lp);
+        if(!firstRun) {
+            // Sleep(100);
+        }
         printf("|");
     }
-    position(15, 2);
 
-    printf("Press the corresponding Keys for the desired action");
-    position(35, 7);
-
-    printf("F: FEE SLIP");
-    position(35, 10);
-
-    printf("M: MODIFY");
-    position(35, 13);
-
+    position(52, 13);
     printf("L: LIST");
-    position(35, 16);
-
-    printf("H: HELP");
-    position(35, 19);
-
-    printf("Q: QUIT");
-    position(35, 22);
-    choice = getch();
-    ch = toupper(choice);
     
+    position(50, 7);
+    printf("F: FEE SLIP");
+    
+    position(51, 10);
+    printf("M: MODIFY");
+
+    position(52, 16);
+    printf("H: HELP");
+
+    position(52, 19);
+    printf("Q: QUIT");
+
+    position(30, 23);
+    printf("Enter your choice for the corresponding action");
+
+    position(53, 25);
+    choice = getch();
+    ch = toupper(choice);   
+    cout << ch;
+    getch();
+
+    firstRun = true;
     switch (ch)
     {
     case 'F':
-        fee.FEE_SLIP();
+        fee.SLIP();
         break;
     case 'M':
         fee.MODIFICATION();
@@ -132,10 +152,13 @@ void mainmenu()
         exit(0);
         break;
     default:
-        position(16, 24);
-        cout << "Illegal Choice Press any key to return to Main Menu";
+        system("cls");
+        position(50, 13);
+        cout << "ILLEGAL CHOICE!!";
+        position(44, 24);
+        cout << "Press any key to return to HOME";
         getch();
-        mainmenu();
+        home();
     }
 }
 //Main Menu Function End
@@ -296,36 +319,54 @@ void FEE::LIST()
     position(5, 23);
     cout << "Press any key to continue..";
     getch();
-    mainmenu();
+    home();
 }
 
 //**********************************************************
 // FUNCTION TO DISPLAY THE RECORD FOR THE GIVEN CLASS
 //**********************************************************
 
-void FEE::DISPLAY(int tclass)
-{
+void FEE::DISPLAY(int tclass) {
+    DRAW d;
     fstream file;
     file.open("FEE.TXT", ios::in);
-    while (file.read((char *)this, sizeof(FEE)))
-    {
-        if (Class == tclass)
-        {
-            position(5, 5);
-            cout << "Class : " << Class;
-            position(5, 7);
-            cout << "~~~~~~~~~~~~";
-            position(5, 8);
-            cout << "Tution Fee  : " << tuition;
-            position(5, 9);
-            cout << "Library  : " << library;
-            position(5, 10);
-            cout << "Science Practicals : " << lab ;
-            position(5, 11);
-            cout << "Computer Fee: " << computer;
-            position(5, 12);
-            cout << "Extra Activity Fee : " << activity;
-            break;
+    float total  = 0;
+    while (file.read((char *)this, sizeof(FEE))) {
+        if (Class == tclass) {
+
+            position(20, 5);
+            cout << "Class              " << Class;
+            
+            position(20, 6);
+            cout << "~~~~~~~~~~~~~~~~~~~~~~";
+            
+            position(20, 7);
+            cout << "Tuition fees       " << tuition;
+            total = total + tuition;
+            
+            position(20, 8);
+            cout << "Library fees       " << library;
+            total = total + library;
+            
+            position(20, 9);
+            cout << "Lab fees           " << lab ;
+            total = total + lab ;
+            
+            position(20, 10);
+            cout << "Computer fees      " << computer;
+            total = total + computer;
+            
+            position(20, 11);
+            cout << "Activity fees      " << activity;
+            total = total + activity;
+            
+            char tt[15];
+            sprintf(tt, "%f", total);
+            position(20, 12);
+            cout << "~~~~~~~~~~~~~~~~~~~~~~";
+            
+            position(20, 13);
+            cout << "Total              "  << total;
         }
     }
     file.close();
@@ -335,8 +376,8 @@ void FEE::DISPLAY(int tclass)
 // FUNCTION TO GIVE DATA TO MODIFY THE FEE RECORD
 //**********************************************************
 
-void FEE::MODIFICATION(void)
-{
+void FEE::MODIFICATION(void) {
+    
     system("cls");
     
     FEE f;
@@ -344,167 +385,163 @@ void FEE::MODIFICATION(void)
     char ch, t1[10];
     int valid = 0, tclass = 0;
     float t2 = 0;
+    
     do
     {
         valid = 1;
-        position(5, 25);
-        cout << "Press <ENTER> for EXIT";
-        position(5, 5);
-        cout << "Enter Class for the Modification of the Fee Structure : ";
+        position(20, 5);
+        cout << "Enter Class : ";
         gets(t1);
         t2 = atoi(t1);
         tclass = t2;
-        if (tclass < 1 || tclass > 12)
-        {
+
+        if (tclass < 1 || tclass > 12) {
             valid = 0;
-            position(5, 25);
-            cout << "Enter correctly";
-            getch();
         }
+
+        if(!valid){
+            position(20, 25);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(20, 5);
+            cout << clear;
+        }
+
     } while (!valid);
     system("cls");
-    position(71, 1);
+    position(60, 5);
     cout << "<0> = Exit";
-    position(71, 2);
+    position(60, 6);
     cout << "<y> = Modify";
-    position(71, 3);
-    cout << "<n> = Return to Main Menu";
+    position(60, 7);
+    cout << "<n> = Home";
 
     DISPLAY(tclass);
     f.Class = tclass;
-    position(5, 25);
-    do
-    {
-        position(5, 15);
-        cout << "Do you want to modify the fee structure (y/n/0) : ";
-        ch = getche();
+    
+    do {
+        position(20, 17);
+        cout << "Do you want to modify the fee structure (y/n) : ";
+        ch = getch();
+        cout << ch;
+        getch();
         if (ch == '0')
             return;
         ch = toupper(ch);
     } while (ch != 'N' && ch != 'Y');
 
     if (ch == 'N')
-        mainmenu();
+        home();
     
     float ttuition = 0.0, tlibrary = 0.0, tlab  = 0.0, tcomputer = 0.0, tactivity = 0.0;
-    position(5, 17);
-    cout << "Tuition Fee : ";
-    position(5, 18);
-    cout << "Library Fee : ";
-    position(5, 19);
-    cout << "Lab Fee : ";
-    position(5, 20);
-    cout << "Computer Fee : ";
-    position(5, 21);
-    cout << "Extra Activity Fee : ";
+    
+    position(30, 20);
+    cout << "Enter New Tuition Fees :           ";
     
     int modified = 5;
 
-    do
-    {
+    do {
         valid = 1;
-        position(5, 27);
-        cout << "Enter TUITION FEE";
-        position(19, 17);
+
+        position(60, 20);
         gets(t1);
         t2 = atof(t1);
         ttuition = t2;
+
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
-            break;
-        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
-            if(isalpha(*p)){
-                valid = 0;
-            }
-        }
+            valid = 0;
 
         if (ttuition > 1000){
             valid = 0;
         }
 
         if(!valid){
-            position(5, 27);
-            cout << "Enter correctly                        ";
-            getch();
+            position(20, 27);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(60, 20);
+            cout << clear;
         }
     } while (!valid);
 
+    position(20, 27);
+    cout << clear;
+    
     modified--;
     f.tuition  = ttuition;
     
-    do
-    {
+    
+    position(30, 21);
+    cout << "Enter New Library Fees :                  ";
+
+    do {
         valid = 1;
-        position(5, 27);
-        cout << "Enter LIBRARY FEE";
-        position(19, 18);
+        
+        position(60, 21);
         gets(t1);
         t2 = atof(t1);
         tlibrary = t2;
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
-            break;
-        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
-            if(isalpha(*p)){
-                valid = 0;
-            }
-        }
+            valid = 0;
 
         if (tlibrary > 1000){
             valid = 0;
         }
 
         if(!valid){
-            position(5, 27);
-            cout << "Enter correctly                        ";
-            getch();
+            position(20, 27);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(60, 21);
+            cout << clear;
         }
     } while (!valid);
 
+    position(20, 27);
+    cout << clear;
     modified--;
     f.library  = tlibrary;
 
-    do
-    {
+    position(30, 22);
+    cout << "Enter New Lab Fees :             ";
+
+    do {
         valid = 1;
-        position(5, 27);
-        cout << "Enter LAB FEES";
-        position(15, 19);
+        
+        position(60, 22);
         gets(t1);
         t2 = atof(t1);
         tlab  = t2;
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
-            break;
+            valid = 0;
 
-        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
-            if(isalpha(*p)){
-                valid = 0;
-            }
-        }
         if (tlab > 1000){
             valid = 0;
         }
 
         if(!valid){
-            position(5, 27);
-            cout << "Enter correctly                    ";
-            getch();
+            position(20, 27);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(60, 22);
+            cout << clear;
         }
     } while (!valid);
 
+    position(20, 27);
+    cout << clear;
     modified--;
-    f.lab  = tlab;
+    f.lab = tlab;
 
-    do
-    {
+    position(30, 23);
+    cout << "Enter New Computer Fees :              ";
+
+    do {
         valid = 1;
-        position(5, 27);
-        cout << "Enter COMPUTER FEES";
-        position(20, 20);
+        
+        position(60, 23);
         gets(t1);
         t2 = atof(t1);
         tcomputer = t2;
@@ -512,34 +549,31 @@ void FEE::MODIFICATION(void)
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
-            break;
-
-        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
-            if(isalpha(*p)){
-                valid = 0;
-            }
-        }
+            valid = 0;
 
         if (tcomputer > 1000){
             valid = 0;
         }
 
         if(!valid){
-            position(5, 27);
-            cout << "Enter correctly";
-            getch();
+            position(20, 27);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(60, 23);
+            cout << clear;
         }
     } while (!valid);
 
+    position(20, 27);
+    cout << clear;
     modified--;
     f.computer = tcomputer;
+
+    position(30, 24);
+    cout << "Enter New Activity Fees :          ";
     
-    do
-    {
+    do {
         valid = 1;
-        position(5, 27);
-        cout << "Enter ACTIVITY FEES";
-        position(26, 21);
+        position(60, 24);
         gets(t1);
         t2 = atof(t1);
         tactivity = t2;
@@ -547,31 +581,35 @@ void FEE::MODIFICATION(void)
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
-            break;
+            valid = 0;
 
-        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
-            if(isalpha(*p)){
-                valid = 0;
-            }
-        }
+        // for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+        //     if(!isdigit(*p)){
+        //         valid = 0;
+        //         break;
+        //     }
+        // }
+
         if (tactivity > 1000){
             valid = 0;
         }
 
         if(!valid){
-            position(5, 27);
-            cout << "Enter correctly";
-            getch();
+            position(20, 27);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(70, 24);
+            cout << clear;
         }
     } while (!valid);
 
+    position(20, 27);
+    cout << clear;
     modified--;
     f.activity = tactivity;
 
-    do
-    {
-        position(5, 25);
-        cout << "Do you want to save (y/n) : ";
+    do {
+        position(20, 27);
+        cout << "Do you want to save this (y/n) : ";
         ch = getche();
         if (ch == '0')
             return;
@@ -580,6 +618,7 @@ void FEE::MODIFICATION(void)
 
     if (ch == 'N')
         return;
+
     if (ch == 'Y'){
         fstream file;
         file.open("FEE.TXT", ios::out | ios::in);
@@ -589,15 +628,15 @@ void FEE::MODIFICATION(void)
         getch();
     }
     
-    mainmenu();
+    home();
+    
 }
 
 //**********************************************************
 // FUNCTION TO DISPLAY THE FEE SLIP FOR THE CLASS
 //**********************************************************
 
-void FEE::FEE_SLIP(void)
-{
+void FEE::SLIP(void) {
     system("cls");
 
     char ch, t1[10];
@@ -605,40 +644,45 @@ void FEE::FEE_SLIP(void)
     do
     {
         valid = 1;
-        position(5, 25);
-        cout << "Press <ENTER> for EXIT";
-        position(5, 5);
-        cout << "Enter Class to see the Fee Structure : ";
+        position(20, 25);
+        cout << "Press <ENTER> to return Home               ";
+        position(20, 5);
+        cout << "CLASS : ";
         gets(t1);
         t = atoi(t1);
         tclass = t;
         if (strlen(t1) == 0)
-            return;
+            home();
         if (tclass < 1 || tclass > 12)
         {
             valid = 0;
-            position(5, 25);
-            cout << "Enter correctly";
-            getch();
+            position(20, 25);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(20, 5);
+            cout << clear;
         }
     } while (!valid);
+    position(20, 25);
+    cout << clear;
+
     char name[26];
-    do
-    {
-        position(5, 25);
-        cout << "ENTER NAME OF THE STUDENT";
+    do {
         valid = 1;
-        position(5, 7);
-        cout << "Name : ";
+        position(20, 6);
+        cout << "STUDENT NAME : ";
         gets(name);
         if (strlen(name) < 1 || strlen(name) > 25)
         {
             valid = 0;
-            position(5, 25);
-            cout << "NAME SHOULD NOT BE GREATER THAN 25";
-            getch();
+            position(20, 25);
+            cout << "Please Enter a valid Name";
+            position(20, 6);
+            cout << clear;
         }
     } while (!valid);
+    position(20, 25);
+    cout << clear;
+
     system("cls");
     DRAW d;
     d.BOX(20, 2, 61, 24, 989);
@@ -654,7 +698,7 @@ void FEE::FEE_SLIP(void)
     cout << "Date: " << d1 << "/" << m1 << "/" << y1;
     d.LINE_HOR(21, 60, 5, 196);
     position(22, 6);
-    cout << "NAME  : " << name;
+    cout << "STUDENT NAME  : " << name;
     position(22, 7);
     cout << "CLASS : " << tclass;
     d.LINE_HOR(21, 60, 8, 196);
@@ -667,45 +711,51 @@ void FEE::FEE_SLIP(void)
     cout << "TOTAL";
     position(54, 23);
     cout << "CASHIER";
+
     fstream file;
     file.open("FEE.TXT", ios::in);
 
     while (!file.eof())
     {
         file.read((char *)this, sizeof(FEE));
-        if (Class == tclass)
-        {
-            cout << "found" << endl;
+        if (Class == tclass) {
             break;
         }
         file.close();
     }
 
     float total = 0.0;
+
     position(23, 12);
     cout << "Tuition fees               "  << tuition;
     total = total + tuition;
+    
     position(23, 13);
     cout << "Library fees               "  << library;
     total = total + library;
+    
     position(23, 14);
     cout << "Science fees               "  << lab ;
     total = total + lab ;
+    
     position(23, 15);
     cout << "Computer fees              "  << computer;
     total = total + computer;
+    
     position(23, 16);
     cout << "Activity fees              "  << activity;
     total = total + activity;
+    
     d.LINE_VER(9, 21, 46, 179);
     char tt[15];
     sprintf(tt, "%f", total);
     position(49, 21);
     cout << tt;
-    position(33, 40);
+
+    position(20, 27);
     cout << "Press any key to return to the main menu..";
     getch();
-    mainmenu();
+    home();
 }
 
 void FEE::HELP()
@@ -725,7 +775,7 @@ void FEE::HELP()
     cout << "3. LIST:      This function displays the list of total fees for all the" << endl;
     cout << "Press any key to continue..........." << endl;
     getch();
-    mainmenu();
+    home();
 }
 
 //**********************************************************
@@ -738,36 +788,38 @@ int main()
     fee.ADDITION();
     system("cls");
 
-    for (i = 10; i < 71; i++)
+    firstRun = false;
+
+    for (i = 26; i < 87; i++)
     {
-        position(i, 5);
-        Sleep(30);
+        position(i, 3);
+        // Sleep(30);
         printf("/");
     }
-    // for (i = 70; i >= 10; i--)
-    // {
-    //     position(i, 22);
-    //     Sleep(30);
-    //     cout << " / ";
-    // }
-    for (j = 6; j <= 11; j++)
+    for (i = 86; i >= 26; i--)
     {
-        position(10, j);
-        Sleep(100);
+        position(i, 7);
+        // Sleep(30);
+        printf("/");
+    }
+    for (j = 4; j <= 6; j++)
+    {
+        position(26, j);
+        // Sleep(100);
         printf("-");
     }
-    for (j = 11; j >= 6; j--)
+    for (j = 6; j >= 4; j--)
     {
-        position(70, j);
-        Sleep(100);
+        position(86, j);
+        // Sleep(100);
         printf("-");
     }
-    position(28, 7);
-    printf("Fee Structure System");
-    position(24, 10);
+    position(45, 5);
+    printf("FEE MANAGEMENT SYSTEM");
+    position(43, 25);
     printf("Press Any Key To Continue..");
     getch();
-    mainmenu();
+    home();
 
     return 0;
 }
