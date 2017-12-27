@@ -219,37 +219,48 @@ void DRAW::BOX(int column1, int row1, int column2, int row2, char c)
 
 void FEE::ADDITION(void)
 {
-    ofstream file;
-    // file.open("FEE.TXT", ios::out | ios::trunc);
-    // file.close();
-    file.open("FEE.TXT", ios::trunc);
-    if (file.fail())
-        {cout << "Hello";
-        exit(0);}
-    FEE f;
-    for (int i = 1; i <= 12; i++)
-    {
-        f.Class = i;
-        f.tuition = 756;
-        f.library = 15;
-        f.lab  = 863;
-        f.computer = 867;
-        f.activity = 964;
-        file.write((char*)&f, sizeof(f));
-    }
+    fstream file;
+    file.open("FEE.TXT", ios:: out | ios::trunc);
     file.close();
-    /*MODIFY_RECORD(12, 450, 50, 60, 60, 50);
-    MODIFY_RECORD(11, 450, 50, 60, 60, 50);
-    MODIFY_RECORD(10, 350, 50, 30, 60, 50);
-    MODIFY_RECORD(9, 350, 50, 20, 60, 50);
-    MODIFY_RECORD(8, 300, 50, 20, 40, 50);
-    MODIFY_RECORD(7, 300, 50, 20, 40, 50);
-    MODIFY_RECORD(6, 300, 50, 20, 40, 50);
-    MODIFY_RECORD(5, 250, 50, 0, 40, 40);
-    MODIFY_RECORD(4, 250, 50, 0, 40, 40);
-    MODIFY_RECORD(3, 250, 50, 0, 40, 40);
+    MODIFY_RECORD(1, 250, 50, 0, 40, 40);
     MODIFY_RECORD(2, 250, 50, 0, 40, 40);
-    MODIFY_RECORD(1, 250, 50, 0, 40, 40);*/
+    MODIFY_RECORD(3, 250, 50, 0, 40, 40);
+    MODIFY_RECORD(4, 250, 50, 0, 40, 40);
+    MODIFY_RECORD(5, 250, 50, 0, 40, 40);
+    MODIFY_RECORD(6, 300, 50, 20, 40, 50);
+    MODIFY_RECORD(7, 300, 50, 20, 40, 50);
+    MODIFY_RECORD(8, 300, 50, 20, 40, 50);
+    MODIFY_RECORD(9, 350, 50, 20, 60, 50);
+    MODIFY_RECORD(10, 350, 50, 30, 60, 50);
+    MODIFY_RECORD(11, 450, 50, 60, 60, 50);
+    MODIFY_RECORD(12, 450, 50, 60, 60, 50);
+}
+
+//**********************************************************
+// FUNCTION TO MODIFY THE FEE RECORD FOR THE GIVEN DATA
+//**********************************************************
+
+void FEE::MODIFY_RECORD(int tclass, float ttuition, float tlibrary, 
+                        float tlab, float tcomputer, float tactivity)
+{
+    ofstream file;
+
+    file.open("FEE.TXT", ios::app);
+    if (file.fail()){
+        exit(0);
+    }
+
+    FEE f;
+    
+    f.Class = tclass;
+    f.tuition = ttuition;
+    f.library = tlibrary;
+    f.lab  = tlab;
+    f.computer = tcomputer;
+    f.activity = tactivity;
+    file.write((char*)&f, sizeof(f));
+    
+    file.close();
 }
 
 //**********************************************************
@@ -321,60 +332,17 @@ void FEE::DISPLAY(int tclass)
 }
 
 //**********************************************************
-// FUNCTION TO MODIFY THE FEE RECORD FOR THE GIVEN DATA
-//**********************************************************
-
-void FEE::MODIFY_RECORD(int tclass, float ttution, float tlibrary, float tlab, float tcomputer, float tactivity)
-{
-    fstream file;
-    file.open("FEE.TXT", ios::in);
-    fstream temp;
-    temp.open("temp.dat", ios::out);
-    file.seekg(0, ios::beg);
-    while (!file.eof())
-    {
-        file.read((char *)this, sizeof(FEE));
-        if (file.eof())
-            break;
-        if (tclass == Class)
-        {
-            Class = tclass;
-            tuition = ttution;
-            library = tlibrary;
-            lab  = tlab ;
-            computer = tcomputer;
-            activity = tactivity;
-            temp.write((char *)this, sizeof(FEE));
-        }
-        else
-            temp.write((char *)this, sizeof(FEE));
-    }
-
-    file.close();
-    temp.close();
-    file.open("FEE.TXT", ios::out);
-    temp.open("temp.dat", ios::in);
-    temp.seekg(0, ios::beg);
-    while (!temp.eof())
-    {
-        temp.read((char *)this, sizeof(FEE));
-        if (temp.eof())
-            break;
-        file.write((char *)this, sizeof(FEE));
-    }
-    file.close();
-    temp.close();
-}
-
-//**********************************************************
 // FUNCTION TO GIVE DATA TO MODIFY THE FEE RECORD
 //**********************************************************
 
 void FEE::MODIFICATION(void)
 {
     system("cls");
+    
+    FEE f;
+    
     char ch, t1[10];
-    int valid = 0, t = 0, tclass = 0;
+    int valid = 0, tclass = 0;
     float t2 = 0;
     do
     {
@@ -384,10 +352,8 @@ void FEE::MODIFICATION(void)
         position(5, 5);
         cout << "Enter Class for the Modification of the Fee Structure : ";
         gets(t1);
-        t = atoi(t1);
-        tclass = t;
-        if (strlen(t1) == 0)
-            return;
+        t2 = atoi(t1);
+        tclass = t2;
         if (tclass < 1 || tclass > 12)
         {
             valid = 0;
@@ -398,13 +364,17 @@ void FEE::MODIFICATION(void)
     } while (!valid);
     system("cls");
     position(71, 1);
-    cout << "<0>=Exit";
+    cout << "<0> = Exit";
+    cout << "\n<y> = Modify";
+    cout << "\n<n> = Return to Main Menu";
+
     DISPLAY(tclass);
+    f.Class = tclass;
     position(5, 25);
     do
     {
         position(5, 15);
-        cout << "Do you want to modify the fee structure (y/n) : ";
+        cout << "Do you want to modify the fee structure (y/n/0) : ";
         ch = getche();
         if (ch == '0')
             return;
@@ -414,7 +384,7 @@ void FEE::MODIFICATION(void)
     if (ch == 'N')
         mainmenu();
     
-    float ttution = 0.0, tlibrary = 0.0, tlab  = 0.0, tcomputer = 0.0, tactivity = 0.0;
+    float ttuition = 0.0, tlibrary = 0.0, tlab  = 0.0, tcomputer = 0.0, tactivity = 0.0;
     position(5, 13);
     position(5, 17);
     cout << "Tuition Fee : ";
@@ -427,48 +397,50 @@ void FEE::MODIFICATION(void)
     position(5, 21);
     cout << "Extra Activity Fee : ";
     int modified = 5;
-    fstream file;
-    file.open("FEE.TXT", ios::in);
-    while (file.read((char *)this, sizeof(FEE)))
-        if (Class == tclass)
-            break;
-    file.close();
+    
 
     do
     {
         valid = 1;
         position(5, 27);
-        cout << "Enter TUITION FEE or Press <ENTER> for no change";
+        cout << "Enter TUITION FEE";
         position(19, 17);
         gets(t1);
         t2 = atof(t1);
-        ttution = t2;
+        ttuition = t2;
         if (t1[0] == '0')
             return;
         if (strlen(t1) == 0)
             break;
-        if (ttution > 1000)
-        {
+        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+            if(isalpha(*p)){
+                valid = 0;
+            }
+        }
+
+        if (ttuition > 1000){
             valid = 0;
+        }
+
+        if(!valid){
             position(5, 27);
-            cout << "7Enter correctly";
+            cout << "Enter correctly";
             getch();
         }
     } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
+    if (strlen(t1) == 0){
         modified--;
-        ttution = tuition;
-        position(20, 17);
-        cout << ttution;
+        f.tuition  = ttuition;
+        position(19, 19);
+        cout << ttuition;
     }
     
     do
     {
         valid = 1;
         position(5, 27);
-        cout << "Enter ANNUAL CHARGES fee or Press <ENTER> for no change";
+        cout << "Enter LIBRARY FEE";
         position(26, 18);
         gets(t1);
         t2 = atof(t1);
@@ -477,9 +449,17 @@ void FEE::MODIFICATION(void)
             return;
         if (strlen(t1) == 0)
             break;
-        if (tlibrary > 1000)
-        {
+        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+            if(isalpha(*p)){
+                valid = 0;
+            }
+        }
+
+        if (tlibrary > 1000){
             valid = 0;
+        }
+
+        if(!valid){
             position(5, 27);
             cout << "Enter correctly";
             getch();
@@ -489,16 +469,16 @@ void FEE::MODIFICATION(void)
     if (strlen(t1) == 0)
     {
         modified--;
-        tlibrary = library;
-        position(26, 18);
-        cout << tlibrary;
+        f.library  = tlibrary ;
+        position(19, 19);
+        cout << tlibrary ;
     }
 
     do
     {
         valid = 1;
         position(5, 27);
-        cout << "Enter SCIENCE FEES or Press <ENTER> for no change";
+        cout << "Enter LAB FEES";
         position(19, 19);
         gets(t1);
         t2 = atof(t1);
@@ -507,69 +487,17 @@ void FEE::MODIFICATION(void)
             return;
         if (strlen(t1) == 0)
             break;
-        if (tlab  > 1000)
-        {
-            valid = 0;
-            position(5, 27);
-            cout << "7Enter correctly";
-            getch();
+            
+        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+            if(isalpha(*p)){
+                valid = 0;
+            }
         }
-    } while (!valid);
-
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        tlab  = lab ;
-        position(19, 19);
-        cout << tlab ;
-    }
-
-    do
-    {
-        valid = 1;
-        position(5, 27);
-        cout << "Enter COMPUTER FEES or Press <ENTER> for no change";
-        position(19, 20);
-        gets(t1);
-        t2 = atof(t1);
-        tcomputer = t2;
-        if (t1[0] == '0')
-            return;
-        if (strlen(t1) == 0)
-            break;
-        if (tcomputer > 1000)
-        {
+        if (tlab > 1000){
             valid = 0;
-            position(5, 27);
-            cout << "7Enter correctly";
-            getch();
         }
-    } while (!valid);
 
-    if (strlen(t1) == 0)
-    {
-        modified--;
-        tcomputer = computer;
-        position(19, 20);
-        cout << tcomputer;
-    }
-
-    do
-    {
-        valid = 1;
-        position(5, 27);
-        cout << "Enter ACTIVITY FEES or Press <ENTER> for no change";
-        position(19, 21);
-        gets(t1);
-        t2 = atof(t1);
-        tactivity = t2;
-        if (t1[0] == '0')
-            return;
-        if (strlen(t1) == 0)
-            break;
-        if (tactivity > 1000)
-        {
-            valid = 0;
+        if(!valid){
             position(5, 27);
             cout << "Enter correctly";
             getch();
@@ -579,12 +507,92 @@ void FEE::MODIFICATION(void)
     if (strlen(t1) == 0)
     {
         modified--;
-        tactivity = activity;
+        f.lab  = tlab ;
+        position(19, 19);
+        cout << tlab ;
+    }
+
+    do
+    {
+        valid = 1;
+        position(5, 27);
+        cout << "Enter COMPUTER FEES";
+        position(19, 20);
+        gets(t1);
+        t2 = atof(t1);
+        tcomputer = t2;
+
+        if (t1[0] == '0')
+            return;
+        if (strlen(t1) == 0)
+            break;
+
+        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+            if(isalpha(*p)){
+                valid = 0;
+            }
+        }
+
+        if (tcomputer > 1000){
+            valid = 0;
+        }
+
+        if(!valid){
+            position(5, 27);
+            cout << "Enter correctly";
+            getch();
+        }
+    } while (!valid);
+
+    if (strlen(t1) == 0)
+    {
+        modified--;
+        f.computer = tcomputer;
+        position(19, 20);
+        cout << tcomputer;
+    }
+
+    do
+    {
+        valid = 1;
+        position(5, 27);
+        cout << "Enter ACTIVITY FEES";
+        position(19, 21);
+        gets(t1);
+        t2 = atof(t1);
+        tactivity = t2;
+        
+        if (t1[0] == '0')
+            return;
+        if (strlen(t1) == 0)
+            break;
+
+        for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+            if(isalpha(*p)){
+                valid = 0;
+            }
+        }
+        if (tactivity > 1000){
+            valid = 0;
+        }
+
+        if(!valid){
+            position(5, 27);
+            cout << "Enter correctly";
+            getch();
+        }
+    } while (!valid);
+
+    if (strlen(t1) == 0)
+    {
+        modified--;
+        f.activity = tactivity;
         position(19, 21);
         cout << tactivity;
     }
     if (!modified)
         mainmenu();
+    
     position(5, 27);
 
     do
@@ -599,12 +607,14 @@ void FEE::MODIFICATION(void)
 
     if (ch == 'N')
         return;
-    MODIFY_RECORD(tclass, ttution, tlibrary, tlab , tcomputer, tactivity);
-    position(5, 27);
-    cout << "Record Modified";
-    position(5, 29);
-    cout << "Press any key to continue...";
-    getch();
+    if (ch == 'Y'){
+
+    }
+    fstream file;
+    file.open("FEE.TXT", ios::out);
+    file.seekg((tclass-1)*sizeof(FEE), ios::beg);
+    file.write((char *)&f, sizeof(FEE));
+    file.close();
     mainmenu();
 }
 
