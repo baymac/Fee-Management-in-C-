@@ -60,7 +60,7 @@ class FEE
 
   public:
     void ADD(void);
-    void MODIFICATION(void);
+    void MODIFY(void);
     void SLIP(void);
     void LIST(void);
     void HELP(void);
@@ -145,7 +145,7 @@ void home()
         fee.SLIP();
         break;
     case 'M':
-        fee.MODIFICATION();
+        fee.MODIFY();
         break;
     case 'L':
         fee.LIST();
@@ -301,18 +301,18 @@ void FEE::LIST()
     system("cls");
 
     DRAW d;
-    d.BOX(39, 2, 73, 24, 218);
+    d.BOX(36, 2, 76, 24, 218);
     
     position(50, 3);
     cout << "ALL CLASSES";
  
-    d.LINE_HOR(40, 72, 4, 196);
+    d.LINE_HOR(37, 75, 4, 196);
  
     position(43, 5);
-    cout << "CLASS            TOTAL FEES";
+    cout << " CLASS           TOTAL FEES";
  
-    d.LINE_HOR(40, 72, 6, 196);
-    d.LINE_HOR(40, 72, 22, 196);
+    d.LINE_HOR(37, 75, 6, 196);
+    d.LINE_HOR(37, 75, 22, 196);
  
     float total;
     int row = 8;
@@ -329,13 +329,53 @@ void FEE::LIST()
         row++;
     }
     file.close();
+
+    position(41, 26);
+    cout << "Press <Enter> to return HOME..";
+
+    position(38, 23);
+    cout << "Enter class to view Fee Structure : ";
+
+    char t1[10];
+    int tclass, t2;
+
+    do {
+        valid = 1;
+        position(74,23);
+        gets(t1);
+        t2 = atoi(t1);
+        tclass = t2;
+
+        if (tclass < 1 || tclass > 12) {
+            valid = 0;
+        }
+
+        if(strlen(t1) == 0) {
+            home();
+        }
+
+        if(!valid){
+            position(37, 25);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(74, 23);
+            cout << clear;
+            d.BOX(36, 2, 76, 24, 218);
+        }
+    }while(!valid);
     
-    position(41, 23);
-    cout << "Press any key to return HOME..";
+    if(strlen(t1) != 0) {
+        system("cls");
+
+        DISPLAY(tclass);
+
+        position(42, 18);
+        cout << "Press <Enter> to go back..";
+
+        getch();
+
+        LIST();
+    }
     
-    getch();
-    
-    home();
 }
 
 //**********************************************************
@@ -394,7 +434,7 @@ void FEE::DISPLAY(int tclass) {
 // FUNCTION TO GIVE DATA TO MODIFY THE FEE RECORD
 //**********************************************************
 
-void FEE::MODIFICATION(void) {
+void FEE::MODIFY(void) {
     
     system("cls");
     
@@ -406,6 +446,9 @@ void FEE::MODIFICATION(void) {
     char ch, t1[10];
     int valid = 0, tclass = 0;
     float t2 = 0;
+
+    position(42, 15);
+    cout << "Press any key to return HOME..";
     
     do
     {
@@ -415,6 +458,10 @@ void FEE::MODIFICATION(void) {
         gets(t1);
         t2 = atoi(t1);
         tclass = t2;
+
+        if(strlen(t1) == 0){
+            home();
+        }
 
         if (tclass < 1 || tclass > 12) {
             valid = 0;
@@ -433,11 +480,6 @@ void FEE::MODIFICATION(void) {
 
     d.BOX(25, 1, 84, 24, 218);
 
-    // position(60, 6);
-    // cout << "<y> = To enter Revised Fees";
-    // position(60, 7);
-    // cout << "<n> = To return Home";
-
     DISPLAY(tclass);
     f.Class = tclass;
     
@@ -453,10 +495,6 @@ void FEE::MODIFICATION(void) {
     if (ch == 'N')
         home();
     
-    // position(60, 6);
-    // cout << clear;
-    // position(60, 7);
-    // cout << clear;
 
     float ttuition = 0.0, tlibrary = 0.0, tlab  = 0.0, tcomputer = 0.0, tactivity = 0.0;
     
@@ -473,8 +511,6 @@ void FEE::MODIFICATION(void) {
         t2 = atof(t1);
         ttuition = t2;
 
-        if (t1[0] == '0')
-            return;
         if (strlen(t1) == 0)
             valid = 0;
 
@@ -694,7 +730,7 @@ void FEE::SLIP(void) {
     char name[26];
     do {
         valid = 1;
-        position(41, 5);
+        position(41, 6);
         cout << "STUDENT NAME : ";
         gets(name);
         if (strlen(name) < 1 || strlen(name) > 25)
@@ -702,7 +738,7 @@ void FEE::SLIP(void) {
             valid = 0;
             position(41, 20);
             cout << "Please Enter a valid Name";
-            position(41, 5);
+            position(41, 6);
             cout << clear;
         }
     } while (!valid);
