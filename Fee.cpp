@@ -29,6 +29,7 @@ void position(int x, int y) // positions the cursor according to the co-ordinate
 
 char ch, choice;
 int i, j, li, lp, rec, valid;
+bool firstRun = false;
 string clear = "                                       ";
 string clear_s = "      ";
 COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
@@ -69,7 +70,7 @@ class FEE
 //****************************************
 //                  MAIN MENU FUNCTION
 //****************************************
-bool firstRun = false;
+
 void home()
 {
     system("cls");
@@ -139,24 +140,29 @@ void home()
     getch();
 
     firstRun = true;
-    switch (ch)
-    {
+    
+    switch (ch) {
     case 'F':
         fee.SLIP();
         break;
+    
     case 'M':
         fee.MODIFY();
         break;
+    
     case 'L':
         fee.LIST();
         break;
+    
     case 'H':
         fee.HELP();
         break;
+    
     case 'E':
         system("cls");
         exit(0);
         break;
+    
     default:
         system("cls");
         position(50, 13);
@@ -166,6 +172,7 @@ void home()
         getch();
         home();
     }
+
 }
 //Main Menu Function End
 
@@ -186,8 +193,7 @@ void DRAW::LINE_HOR(int column1, int column2, int row, char c)
 // FUNCTION TO DRAW VERTICAL LINE
 //**********************************************************
 
-void DRAW::LINE_VER(int row1, int row2, int column, char c)
-{
+void DRAW::LINE_VER(int row1, int row2, int column, char c) {
     for (row1; row1 <= row2; row1++)
     {
         position(column, row1);
@@ -199,8 +205,7 @@ void DRAW::LINE_VER(int row1, int row2, int column, char c)
 // FUNCTION TO DRAW BOX LINE
 //**********************************************************
 
-void DRAW::BOX(int column1, int row1, int column2, int row2, char c)
-{
+void DRAW::BOX(int column1, int row1, int column2, int row2, char c) {
     char ch = 218;
     char c1, c2, c3, c4;
     char l1 = 196, l2 = 179;
@@ -361,6 +366,7 @@ void FEE::LIST()
             cout << clear;
             d.BOX(36, 2, 76, 24, 218);
         }
+
     }while(!valid);
     
     if(strlen(t1) != 0) {
@@ -543,8 +549,7 @@ void FEE::MODIFY(void) {
         gets(t1);
         t2 = atof(t1);
         tlibrary = t2;
-        if (t1[0] == '0')
-            return;
+    
         if (strlen(t1) == 0)
             valid = 0;
 
@@ -575,8 +580,7 @@ void FEE::MODIFY(void) {
         gets(t1);
         t2 = atof(t1);
         tlab  = t2;
-        if (t1[0] == '0')
-            return;
+
         if (strlen(t1) == 0)
             valid = 0;
 
@@ -608,8 +612,6 @@ void FEE::MODIFY(void) {
         t2 = atof(t1);
         tcomputer = t2;
 
-        if (t1[0] == '0')
-            return;
         if (strlen(t1) == 0)
             valid = 0;
 
@@ -640,8 +642,6 @@ void FEE::MODIFY(void) {
         t2 = atof(t1);
         tactivity = t2;
         
-        if (t1[0] == '0')
-            return;
         if (strlen(t1) == 0)
             valid = 0;
 
@@ -684,7 +684,12 @@ void FEE::MODIFY(void) {
     if (ch == 'Y'){
         fstream file;
         file.open("FEE.TXT", ios::out | ios::in);
-        file.seekp((tclass-1)*sizeof(FEE));
+        if(tclass < 12) {
+            file.seekp((tclass-1)*sizeof(FEE));
+        } else {
+            file.seekp((11*sizeof(FEE)) + 1);
+        }
+        
         file.write((char *)&f, sizeof(FEE));
         file.close();
         getch();
