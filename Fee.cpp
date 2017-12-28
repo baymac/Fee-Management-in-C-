@@ -839,21 +839,21 @@ void FEE::HELP()
 
     DRAW d;
 
-    d.BOX(25, 2, 100, 18, 218);
+    d.BOX(21, 2, 96, 19, 218);
 
-    position(45, 3);
+    position(41, 3);
     cout << "Welcome to FEE MANAGEMENT SYSTEM";
-    position(30, 5);
+    position(26, 6);
     cout << "Following functions are available:";
-    position(30, 7);
-    cout << "   1. LIST - It lists total fees for all the classes";
-    position(30, 9);
-    cout << "   2. FEE SLIP - It generates the Fee Slip of a Student";
-    position(30, 11);
-    cout << "   3. MODIFY - It lets you modify the fees structure for a class";
-    position(30, 13);
-    cout << "   4. EXIT - It exits the program and returns to the command line";
-    position(45, 17);
+    position(26, 8);
+    cout << "1. LIST - It lists total fees for all the classes";
+    position(26, 10);
+    cout << "2. FEE SLIP - It generates the Fee Slip of a Student";
+    position(26, 12);
+    cout << "3. MODIFY - It lets you modify the fees structure for a class";
+    position(26, 14);
+    cout << "4. EXIT - It exits the program and returns to the command line";
+    position(41, 18);
     cout << "Press any key to return home..";
 
     getch();
