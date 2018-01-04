@@ -15,27 +15,21 @@
 
 using namespace std;
 
+void startAnimation();
 void homeAnimation(bool);
 void home();
-
-
-void position(int x, int y) // positions the cursor according to the co-ordinates
-{
-    COORD coord = {x, y}; // coord is a structure defined in windows.h
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
+void position(int, int);
 
 // Global Variables
 
 char ch, choice;
-int i, j, li, lp, rec, valid;
+int i, j, valid;
 bool firstRun = false;
 string clear = "                                       ";
 string clear_s = "      ";
 COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
 
 // To draw lines, boxes
-
 class DRAW
 {
   public:
@@ -64,7 +58,7 @@ void DRAW::LINE_VER(int row1, int row2, int column, char c) {
 
 // Draws a box between 2 diagonally opposite points 
 void DRAW::BOX(int column1, int row1, int column2, int row2, char c) {
-    char ch = 218;
+    ch = 218;
     char c1, c2, c3, c4;
     char l1 = 196, l2 = 179;
     if (c == ch)
@@ -155,14 +149,14 @@ void FEE::INSERT_FEES(int tclass, float ttuition, float tlibrary,
         exit(0);
     }
     
-    fee.Class = tclass;
-    fee.tuition = ttuition;
-    fee.library = tlibrary;
-    fee.lab  = tlab;
-    fee.computer = tcomputer;
-    fee.activity = tactivity;
+    Class = tclass;
+    tuition = ttuition;
+    library = tlibrary;
+    lab  = tlab;
+    computer = tcomputer;
+    activity = tactivity;
 
-    file.write((char*)&fee, sizeof(fee));
+    file.write((char*)this, sizeof(FEE));
     
     file.close();
 }
@@ -310,10 +304,9 @@ void FEE::MODIFY(void) {
     FEE f;
     
     DRAW d;
-    
 
-    char ch, input[10];
-    int valid = 0, tclass = 0;
+    char input[10];
+    int tclass = 0;
     float cInput = 0;
 
     position(42, 15);
@@ -578,8 +571,10 @@ void FEE::MODIFY(void) {
 void FEE::SLIP(void) {
     system("cls");
 
-    char ch, input[10];
-    int valid = 0, t = 0, tclass = 0;
+    char input[10];
+    int cInput = 0, tclass = 0;
+    float total = 0;
+
     do
     {
         valid = 1;
@@ -588,8 +583,8 @@ void FEE::SLIP(void) {
         position(41, 4);
         cout << "CLASS : ";
         gets(input);
-        t = atoi(input);
-        tclass = t;
+        cInput = atoi(input);
+        tclass = cInput;
 
         if (strlen(input) == 0)
             home();
@@ -603,6 +598,7 @@ void FEE::SLIP(void) {
             cout << clear;
         }
     } while (!valid);
+
     position(41, 20);
     cout << clear;
 
@@ -669,42 +665,40 @@ void FEE::SLIP(void) {
     fstream file;
     file.open("FEE.TXT", ios::in);
 
-    while (!file.eof())
-    {
-        file.read((char *)this, sizeof(FEE));
+    while (file.read((char *)this, sizeof(FEE))) {
+        
         if (Class == tclass) {
-            break;
+
+            total = 0.00;
+
+            position(39, 12);
+            cout << "Tuition fees               "  << tuition;
+            total = total + tuition;
+            
+            position(39, 13);
+            cout << "Library fees               "  << library;
+            total = total + library;
+            
+            position(39, 14);
+            cout << "Science fees               "  << lab ;
+            total = total + lab ;
+            
+            position(39, 15);
+            cout << "Computer fees              "  << computer;
+            total = total + computer;
+            
+            position(39, 16);
+            cout << "Activity fees              "  << activity;
+            total = total + activity;
         }
-        file.close();
     }
+    
+    file.close();
 
-    float total = 0.0;
-
-    position(39, 12);
-    cout << "Tuition fees               "  << tuition;
-    total = total + tuition;
-    
-    position(39, 13);
-    cout << "Library fees               "  << library;
-    total = total + library;
-    
-    position(39, 14);
-    cout << "Science fees               "  << lab ;
-    total = total + lab ;
-    
-    position(39, 15);
-    cout << "Computer fees              "  << computer;
-    total = total + computer;
-    
-    position(39, 16);
-    cout << "Activity fees              "  << activity;
-    total = total + activity;
-    
     d.LINE_VER(9, 21, 62, 179);
-    char tt[15];
-    sprintf(tt, "%f", total);
-    position(65, 21);
-    cout << tt;
+    
+    position(66, 21);
+    cout << total ;
 
     position(41, 27);
     cout << "Press any key to return HOME..";
@@ -816,7 +810,6 @@ void home() {
 
 }
 
-
 // Main Function from the program runs
 int main()
 {
@@ -824,39 +817,40 @@ int main()
 
     firstRun = false;
 
-    for (i = 26; i < 87; i++)
-    {
+    startAnimation();
+
+    getch();
+
+    home();
+}
+
+void startAnimation() {
+    for (i = 26; i < 87; i++) {
         position(i, 3);
         Sleep(10);
         printf("/");
     }
-    for (i = 86; i >= 26; i--)
-    {
+    for (i = 86; i >= 26; i--) {
         position(i, 7);
         Sleep(10);
         printf("/");
     }
-    for (j = 4; j <= 6; j++)
-    {
+    for (j = 4; j <= 6; j++) {
         position(26, j);
         Sleep(100);
         printf("-");
     }
-    for (j = 6; j >= 4; j--)
-    {
+    for (j = 6; j >= 4; j--) {
         position(86, j);
         Sleep(100);
         printf("-");
     }
+
     position(45, 5);
     printf("FEE MANAGEMENT SYSTEM");
+    
     position(43, 25);
     printf("Press Any Key To Continue..");
-    getch();
-
-    home();
-
-    return 0;
 }
 
 void homeAnimation(bool firstRun) {
@@ -867,29 +861,29 @@ void homeAnimation(bool firstRun) {
     printf("HOME");
 
     // Following four loops are for animation of Home Screen
-    for (li = 45; li <= 65; li++) {
-        position(li, 5);
+    for (i = 45; i <= 65; i++) {
+        position(i, 5);
         if(!firstRun) {
             Sleep(30);
         }
         printf("*");
     }
-    for (li = 65; li >= 45; li--) {
-        position(li, 21);
+    for (i = 65; i >= 45; i--) {
+        position(i, 21);
         if(!firstRun) {
             Sleep(30);
         }
         printf("*");
     }
-    for (lp = 6; lp < 21; lp++) {
-        position(45, lp);
+    for (j = 6; j < 21; j++) {
+        position(45, j);
         if(!firstRun) {
             Sleep(70);
         }
         printf("|");
     }
-    for (lp = 20; lp >= 6; lp--) {
-        position(65, lp);
+    for (j = 20; j >= 6; j--) {
+        position(65, j);
         if(!firstRun) {
             Sleep(70);
         }
@@ -915,4 +909,11 @@ void homeAnimation(bool firstRun) {
     printf("Enter your choice for the corresponding action");
 
     d.BOX(29, 2, 82, 26, 218);
+
+}
+
+// Function positions the cursor according to the co-ordinates 
+void position(int x, int y) {
+    COORD coord = {x, y}; // coord is a structure defined in windows.h
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
