@@ -15,7 +15,9 @@
 
 using namespace std;
 
-void help(); // function definition for help
+void homeAnimation(bool);
+void home();
+
 
 void position(int x, int y) // positions the cursor according to the co-ordinates
 {
@@ -23,9 +25,7 @@ void position(int x, int y) // positions the cursor according to the co-ordinate
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-//**************************************
-//  GLOBAL VARIABLE DECLARATIONS
-//**************************************
+// Global Variables
 
 char ch, choice;
 int i, j, li, lp, rec, valid;
@@ -34,9 +34,7 @@ string clear = "                                       ";
 string clear_s = "      ";
 COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
 
-//**************************** ********
-// THIS CLASS DRAWS LINES, BOXES, ETC.
-//**************************** ********
+// To draw lines, boxes
 
 class DRAW
 {
@@ -46,142 +44,8 @@ class DRAW
     void BOX(int, int, int, int, char);
 };
 
-//**********************************************************
-// THIS CLASS CONTROLS ALL THE FUNCTIONS RELATED TO FEES
-//**********************************************************
-
-class FEE
-{
-  private:
-    int Class;
-    float tuition, library, lab , computer, activity;
-    void DISPLAY(int);
-    void INSERT_FEES(int, float, float, float, float, float);
-
-
-  public:
-    void ADD(void);
-    void MODIFY(void);
-    void SLIP(void);
-    void LIST(void);
-    void HELP(void);
-} fee;
-
-//****************************************
-//                  MAIN MENU FUNCTION
-//****************************************
-
-void home()
-{
-    system("cls");
-
-    DRAW d;
-
-    position(53, 3);
-    printf("HOME");
-
-    for (li = 45; li <= 65; li++)
-    {
-        position(li, 5);
-        if(!firstRun) {
-            // Sleep(30);
-        }
-        printf("*");
-    }
-    for (li = 65; li >= 45; li--)
-    {
-        position(li, 21);
-        if(!firstRun) {
-            // Sleep(30);
-        }
-        printf("*");
-    }
-    for (lp = 6; lp < 21; lp++)
-    {
-        position(45, lp);
-        if(!firstRun) {
-            // Sleep(100);
-        }
-        printf("|");
-    }
-    for (lp = 20; lp >= 6; lp--)
-    {
-        position(65, lp);
-        if(!firstRun) {
-            // Sleep(100);
-        }
-        printf("|");
-    }
-
-    position(52, 7);
-    printf("L: LIST");
-    
-    position(50, 10);
-    printf("F: FEE SLIP");
-    
-    position(51, 13);
-    printf("M: MODIFY");
-
-    position(52, 16);
-    printf("H: HELP");
-
-    position(52, 19);
-    printf("E: EXIT");
-
-    position(32, 23);
-    printf("Enter your choice for the corresponding action");
-
-    d.BOX(29, 2, 82, 26, 218);
-
-    position(55, 25);
-    choice = getch();
-    ch = toupper(choice);   
-    cout << ch;
-    getch();
-
-    firstRun = true;
-    
-    switch (ch) {
-    case 'F':
-        fee.SLIP();
-        break;
-    
-    case 'M':
-        fee.MODIFY();
-        break;
-    
-    case 'L':
-        fee.LIST();
-        break;
-    
-    case 'H':
-        fee.HELP();
-        break;
-    
-    case 'E':
-        system("cls");
-        exit(0);
-        break;
-    
-    default:
-        system("cls");
-        position(50, 13);
-        cout << "ILLEGAL CHOICE!!";
-        position(44, 24);
-        cout << "Press any key to return to HOME";
-        getch();
-        home();
-    }
-
-}
-//Main Menu Function End
-
-//************************************
-// FUNCTION TO DRAW HORIZONTAL LINE
-//************************************
-
-void DRAW::LINE_HOR(int column1, int column2, int row, char c)
-{
+// Draws a horizontal line between 2 points
+void DRAW::LINE_HOR(int column1, int column2, int row, char c) {
     for (column1; column1 <= column2; column1++)
     {
         position(column1, row);
@@ -189,10 +53,7 @@ void DRAW::LINE_HOR(int column1, int column2, int row, char c)
     }
 }
 
-//**********************************************************
-// FUNCTION TO DRAW VERTICAL LINE
-//**********************************************************
-
+// Draws a vertical line between 2 points
 void DRAW::LINE_VER(int row1, int row2, int column, char c) {
     for (row1; row1 <= row2; row1++)
     {
@@ -201,10 +62,7 @@ void DRAW::LINE_VER(int row1, int row2, int column, char c) {
     }
 }
 
-//**********************************************************
-// FUNCTION TO DRAW BOX LINE
-//**********************************************************
-
+// Draws a box between 2 diagonally opposite points 
 void DRAW::BOX(int column1, int row1, int column2, int row2, char c) {
     char ch = 218;
     char c1, c2, c3, c4;
@@ -247,16 +105,32 @@ void DRAW::BOX(int column1, int row1, int column2, int row2, char c) {
     LINE_VER(row1, row2, column2, l2);
 }
 
-//**********************************************************
-// FUNCTION TO ADD FEE STRUCTURE IN FEE FILE
-//**********************************************************
 
-void FEE::ADD(void)
+// This class contains all the essential functions and variables for fee management
+class FEE
 {
+  private:
+    int Class;
+    float tuition, library, lab, computer, activity;
+    void DISPLAY(int);
+    void INSERT_FEES(int, float, float, float, float, float);
+
+  public:
+    void ADD(void);
+    void MODIFY(void);
+    void SLIP(void);
+    void LIST(void);
+    void HELP(void);
+} fee;
+
+// Function to add default values of fee structure
+void FEE::ADD(void) {
+
     fstream file;
-    file.open("FEE.TXT", ios:: out | ios::trunc);
+    file.open("FEE.TXT", ios::out | ios::trunc);
     file.close();
-    INSERT_FEES(1, 250, 50, 0, 40, 40);
+
+    INSERT_FEES(1, 250, 50, 0, 40, 40); 
     INSERT_FEES(2, 250, 50, 0, 40, 40);
     INSERT_FEES(3, 250, 50, 0, 40, 40);
     INSERT_FEES(4, 250, 50, 0, 40, 40);
@@ -270,12 +144,9 @@ void FEE::ADD(void)
     INSERT_FEES(12, 450, 50, 60, 60, 50);
 }
 
-//**********************************************************
-// FUNCTION TO MODIFY THE FEE RECORD FOR THE GIVEN DATA
-//**********************************************************
-
+// Function to insert the fee structure into the file
 void FEE::INSERT_FEES(int tclass, float ttuition, float tlibrary, 
-                        float tlab, float tcomputer, float tactivity)
+                      float tlab, float tcomputer, float tactivity)
 {
     ofstream file;
 
@@ -283,26 +154,21 @@ void FEE::INSERT_FEES(int tclass, float ttuition, float tlibrary,
     if (file.fail()){
         exit(0);
     }
-
-    FEE f;
     
-    f.Class = tclass;
-    f.tuition = ttuition;
-    f.library = tlibrary;
-    f.lab  = tlab;
-    f.computer = tcomputer;
-    f.activity = tactivity;
-    file.write((char*)&f, sizeof(f));
+    fee.Class = tclass;
+    fee.tuition = ttuition;
+    fee.library = tlibrary;
+    fee.lab  = tlab;
+    fee.computer = tcomputer;
+    fee.activity = tactivity;
+
+    file.write((char*)&fee, sizeof(fee));
     
     file.close();
 }
 
-//**********************************************************
-// FUNCTION TO DISPLAY TOTAL FEE AS LIST
-//**********************************************************
-
-void FEE::LIST()
-{
+// Function to list all the fee structures of all classes
+void FEE::LIST() {
     system("cls");
 
     DRAW d;
@@ -319,11 +185,12 @@ void FEE::LIST()
     d.LINE_HOR(37, 75, 6, 196);
     d.LINE_HOR(37, 75, 22, 196);
  
-    float total;
+    float total = 0;
     int row = 8;
     
     fstream file;
     file.open("FEE.TXT", ios::in);
+
     while (file.read((char *)this, sizeof(FEE)))
     {
         total = tuition + library + lab  + computer + activity;
@@ -333,6 +200,7 @@ void FEE::LIST()
         cout << total;
         row++;
     }
+
     file.close();
 
     position(41, 26);
@@ -341,23 +209,23 @@ void FEE::LIST()
     position(38, 23);
     cout << "Enter class to view Fee Structure : ";
 
-    char t1[10];
-    int tclass, t2;
+    char input[10];
+    int tclass, cInput;
 
     do {
         valid = 1;
         position(74,23);
-        gets(t1);
-        t2 = atoi(t1);
-        tclass = t2;
+        gets(input);
+        cInput = atoi(input);
+        tclass = cInput;
 
         if (tclass < 1 || tclass > 12) {
             valid = 0;
         }
 
-        if(strlen(t1) == 0) {
+        if(strlen(input) == 0) {
             home();
-        }
+        }   
 
         if(!valid){
             position(37, 25);
@@ -369,7 +237,7 @@ void FEE::LIST()
 
     }while(!valid);
     
-    if(strlen(t1) != 0) {
+    if(strlen(input) != 0) {
         system("cls");
 
         DISPLAY(tclass);
@@ -384,19 +252,17 @@ void FEE::LIST()
     
 }
 
-//**********************************************************
-// FUNCTION TO DISPLAY THE RECORD FOR THE GIVEN CLASS
-//**********************************************************
-
+// Function to display fee structure for a given class
 void FEE::DISPLAY(int tclass) {
     DRAW d;
 
     fstream file;
     file.open("FEE.TXT", ios::in);
     
-    float total  = 0;
+    float total = 0;
     
     while (file.read((char *)this, sizeof(FEE))) {
+        
         if (Class == tclass) {
 
             position(50, 2);
@@ -436,10 +302,7 @@ void FEE::DISPLAY(int tclass) {
     file.close();
 }
 
-//**********************************************************
-// FUNCTION TO GIVE DATA TO MODIFY THE FEE RECORD
-//**********************************************************
-
+// Function to modify fee structure of a given class
 void FEE::MODIFY(void) {
     
     system("cls");
@@ -449,9 +312,9 @@ void FEE::MODIFY(void) {
     DRAW d;
     
 
-    char ch, t1[10];
+    char ch, input[10];
     int valid = 0, tclass = 0;
-    float t2 = 0;
+    float cInput = 0;
 
     position(42, 15);
     cout << "Press any key to return HOME..";
@@ -461,11 +324,11 @@ void FEE::MODIFY(void) {
         valid = 1;
         position(49, 3);
         cout << "Enter Class : ";
-        gets(t1);
-        t2 = atoi(t1);
-        tclass = t2;
+        gets(input);
+        cInput = atoi(input);
+        tclass = cInput;
 
-        if(strlen(t1) == 0){
+        if(strlen(input) == 0){
             home();
         }
 
@@ -513,11 +376,11 @@ void FEE::MODIFY(void) {
         valid = 1;
 
         position(66, 16);
-        gets(t1);
-        t2 = atof(t1);
-        ttuition = t2;
+        gets(input);
+        cInput = atof(input);
+        ttuition = cInput;
 
-        if (strlen(t1) == 0)
+        if (strlen(input) == 0)
             valid = 0;
 
         if (ttuition > 1000){
@@ -528,7 +391,7 @@ void FEE::MODIFY(void) {
             position(36, 23);
             cout << "Wrong Value Entered, Please Enter Again";
             position(66, 16);
-            cout << clear_s;
+            cout << clear_s;    
         }
     } while (!valid);
 
@@ -546,11 +409,11 @@ void FEE::MODIFY(void) {
         valid = 1;
         
         position(66, 17);
-        gets(t1);
-        t2 = atof(t1);
-        tlibrary = t2;
+        gets(input);
+        cInput = atof(input);
+        tlibrary = cInput;
     
-        if (strlen(t1) == 0)
+        if (strlen(input) == 0)
             valid = 0;
 
         if (tlibrary > 1000){
@@ -577,11 +440,11 @@ void FEE::MODIFY(void) {
         valid = 1;
         
         position(66, 18);
-        gets(t1);
-        t2 = atof(t1);
-        tlab  = t2;
+        gets(input);
+        cInput = atof(input);
+        tlab  = cInput;
 
-        if (strlen(t1) == 0)
+        if (strlen(input) == 0)
             valid = 0;
 
         if (tlab > 1000){
@@ -608,11 +471,11 @@ void FEE::MODIFY(void) {
         valid = 1;
         
         position(66, 19);
-        gets(t1);
-        t2 = atof(t1);
-        tcomputer = t2;
+        gets(input);
+        cInput = atof(input);
+        tcomputer = cInput;
 
-        if (strlen(t1) == 0)
+        if (strlen(input) == 0)
             valid = 0;
 
         if (tcomputer > 1000){
@@ -638,14 +501,14 @@ void FEE::MODIFY(void) {
     do {
         valid = 1;
         position(66, 20);
-        gets(t1);
-        t2 = atof(t1);
-        tactivity = t2;
+        gets(input);
+        cInput = atof(input);
+        tactivity = cInput;
         
-        if (strlen(t1) == 0)
+        if (strlen(input) == 0)
             valid = 0;
 
-        // for(char *p = t1; p != t1 + sizeof(t1) / sizeof(t1[0]); ++p){
+        // for(char *p = input; p != input + sizeof(input) / sizeof(input[0]); ++p){
         //     if(!isdigit(*p)){
         //         valid = 0;
         //         break;
@@ -684,29 +547,38 @@ void FEE::MODIFY(void) {
     if (ch == 'Y'){
         fstream file;
         file.open("FEE.TXT", ios::out | ios::in);
-        if(tclass < 12) {
+        
+        if(tclass <= 10) {
             file.seekp((tclass-1)*sizeof(FEE));
         } else {
-            file.seekp((11*sizeof(FEE)) + 1);
+            file.seekp(((tclass-1)*sizeof(FEE)) + 1);
         }
         
         file.write((char *)&f, sizeof(FEE));
         file.close();
         getch();
     }
+
+    system("cls");
+
+    DISPLAY(tclass);
     
+    position(40, 13);
+    printf("The new fee structure for class %d", tclass);
+    
+    position(42, 17);
+    printf("Press <Enter> to return HOME..");
+    getch();
+
     home();
-    
 }
 
-//**********************************************************
-// FUNCTION TO DISPLAY THE FEE SLIP FOR THE CLASS
-//**********************************************************
 
+// Function to display the Fee Slip
 void FEE::SLIP(void) {
     system("cls");
 
-    char ch, t1[10];
+    char ch, input[10];
     int valid = 0, t = 0, tclass = 0;
     do
     {
@@ -715,15 +587,17 @@ void FEE::SLIP(void) {
         cout << "Press <ENTER> to return Home               ";
         position(41, 4);
         cout << "CLASS : ";
-        gets(t1);
-        t = atoi(t1);
+        gets(input);
+        t = atoi(input);
         tclass = t;
-        if (strlen(t1) == 0)
+
+        if (strlen(input) == 0)
             home();
+
         if (tclass < 1 || tclass > 12)
         {
             valid = 0;
-            position(41, 20);
+            position(41, 19);
             cout << "Wrong Value Entered, Please Enter Again";
             position(41, 4);
             cout << clear;
@@ -834,7 +708,9 @@ void FEE::SLIP(void) {
 
     position(41, 27);
     cout << "Press any key to return HOME..";
+
     getch();
+    
     home();
 }
 
@@ -866,14 +742,84 @@ void FEE::HELP()
     home();
 }
 
-//**********************************************************
-// MAIN FUNCTION TO CREATE MENU AND CALL OTHER FUNCTIONS
-//**********************************************************
+// HOME FUNCTION
+void home() {
+    system("cls");
+    
+    homeAnimation(firstRun);
 
+    position(55, 25);
+    choice = getch();
+    ch = toupper(choice);   
+    cout << ch;
+    getch();
+
+    firstRun = true;
+    
+    int processing = 3;
+
+    switch (ch) {
+    case 'F':
+        fee.SLIP();
+        break;
+    
+    case 'M':
+        fee.MODIFY();
+        break;
+    
+    case 'L':
+        fee.LIST();
+        break;
+    
+    case 'H':
+        fee.HELP();
+        break;
+    
+    case 'E':
+        system("cls");
+        exit(0);
+        break;
+
+    case 'D':
+        system("cls");
+        position(30,4);
+        cout << "Entering all the default values for all classes fees";
+        processing = 3;
+        while(processing--) {
+            for(i = 0; i < 3; i++) {
+                position(54 + i, 5);
+                cout << ".";
+                Sleep(500);
+            }
+            position(54, 5);
+            cout << clear_s;
+        }
+        fee.ADD();
+        system("cls");
+        position(54, 7);
+        cout << "DONE!";
+        position(43, 12);
+        cout << "Press <Enter> to return HOME..";
+        getch();
+        home();
+        break;
+    
+    default:
+        system("cls");
+        position(50, 13);
+        cout << "ILLEGAL CHOICE!!";
+        position(44, 24);
+        cout << "Press any key to return to HOME";
+        getch();
+        home();
+    }
+
+}
+
+
+// Main Function from the program runs
 int main()
 {
-    FEE fee;
-    fee.ADD();
     system("cls");
 
     firstRun = false;
@@ -881,25 +827,25 @@ int main()
     for (i = 26; i < 87; i++)
     {
         position(i, 3);
-        // Sleep(30);
+        Sleep(10);
         printf("/");
     }
     for (i = 86; i >= 26; i--)
     {
         position(i, 7);
-        // Sleep(30);
+        Sleep(10);
         printf("/");
     }
     for (j = 4; j <= 6; j++)
     {
         position(26, j);
-        // Sleep(100);
+        Sleep(100);
         printf("-");
     }
     for (j = 6; j >= 4; j--)
     {
         position(86, j);
-        // Sleep(100);
+        Sleep(100);
         printf("-");
     }
     position(45, 5);
@@ -907,7 +853,66 @@ int main()
     position(43, 25);
     printf("Press Any Key To Continue..");
     getch();
+
     home();
 
     return 0;
+}
+
+void homeAnimation(bool firstRun) {
+    
+    DRAW d;
+
+    position(53, 3);
+    printf("HOME");
+
+    // Following four loops are for animation of Home Screen
+    for (li = 45; li <= 65; li++) {
+        position(li, 5);
+        if(!firstRun) {
+            Sleep(30);
+        }
+        printf("*");
+    }
+    for (li = 65; li >= 45; li--) {
+        position(li, 21);
+        if(!firstRun) {
+            Sleep(30);
+        }
+        printf("*");
+    }
+    for (lp = 6; lp < 21; lp++) {
+        position(45, lp);
+        if(!firstRun) {
+            Sleep(70);
+        }
+        printf("|");
+    }
+    for (lp = 20; lp >= 6; lp--) {
+        position(65, lp);
+        if(!firstRun) {
+            Sleep(70);
+        }
+        printf("|");
+    }
+
+    position(52, 7);
+    printf("L: LIST");
+    
+    position(50, 10);
+    printf("F: FEE SLIP");
+    
+    position(51, 13);
+    printf("M: MODIFY");
+
+    position(52, 16);
+    printf("H: HELP");
+
+    position(52, 19);
+    printf("E: EXIT");
+
+    position(32, 23);
+    printf("Enter your choice for the corresponding action");
+
+    d.BOX(29, 2, 82, 26, 218);
 }
