@@ -42,9 +42,10 @@ void startAnimation();
 void homeAnimation();
 void home();
 void position(int, int);
+void customAnimation(int, int, int, int, bool, bool, string, string);
 
 // Global Variables
-char ch, choice;
+char ch;
 int i, j, valid;
 string clear = "                                       ";
 string clear_s = "      ";
@@ -726,16 +727,16 @@ bool FEE::feeSlip(void)
 
     position(49, 2);
     cout << "GENERATE FEE SLIP";
-    d.hLine(36, 79, 3, 196);
+    d.hLine(33, 82, 3, 196);
 
     char input[3];
     int tclass = 0;
     float total = 0;
 
-    position(41, 6);
+    position(44, 6);
     cout << "CLASS : ";
 
-    position(41, 8);
+    position(44, 8);
     cout << "STUDENT NAME : ";
 
     do
@@ -743,8 +744,8 @@ bool FEE::feeSlip(void)
         valid = 1;
         position(44, 20);
         cout << "Press <ENTER> to return Home               ";
-        d.box(35, 1, 80, 22, 218);
-        position(41, 6);
+        d.box(32, 1, 83, 22, 218);
+        position(44, 6);
         cout << "CLASS : ";
         gets(input);
         tclass = atoi(input);
@@ -758,7 +759,7 @@ bool FEE::feeSlip(void)
             valid = 0;
             position(38, 18);
             cout << "Wrong Value Entered, Please Enter Again";
-            position(41, 6);
+            position(44, 6);
             cout << clear;
         }
     } while (!valid);
@@ -769,7 +770,7 @@ bool FEE::feeSlip(void)
     do
     {
         valid = 1;
-        position(41, 8);
+        position(44, 8);
         cout << "STUDENT NAME : ";
         getline(cin, name);
         if (name.length() == 0) {
@@ -778,10 +779,34 @@ bool FEE::feeSlip(void)
         else if (!s.studentFind(tclass, name))
         {
             valid = 0;
-            position(43, 18);
+            position(43, 16);
             cout << "Name is not registered with us";
-            position(41, 8);
+            do
+            {   
+                position(80, 18);
+                cout << " ";
+                position(36, 18);
+                cout << "Do you want to register the student (y/n) : ";
+                ch = getch();
+                cout << ch;
+                ch = toupper(ch);
+                getch();
+            } while (ch != 'N' && ch != 'Y');
+            bool b = true;
+            if (ch == 'Y')
+            {
+                while(b)
+                {
+                    b = s.registerStudent();
+                }
+                return true;
+            }
+            position(44, 8);
             cout << clear;
+            position(43, 16);
+            cout << clear;
+            position(36, 18);
+            cout << clear + "       ";
         }
     } while (!valid);
 
@@ -897,7 +922,7 @@ void FEE::showHelp()
     position(21, 15);
     cout << "5. Modify - You can modify the fees structure for a class";
     position(21, 17);
-    cout << "H. Help - You can find all the information about all functions";
+    cout << "H. Help - You can see information about all functions";
     position(21, 19);
     cout << "E. EXIT - To Exit the program and return to the command line";
     position(21, 21);
@@ -916,8 +941,8 @@ void home()
     homeAnimation();
 
     position(55, 24);
-    choice = getch();
-    ch = toupper(choice);
+    ch = getch();
+    ch = toupper(ch);
     cout << ch;
     position(55, 24);
     getch();
@@ -1095,6 +1120,56 @@ void homeAnimation()
     d.vLine(2, 24, 81, '*');
 }
 
+void customAnimation(int row1, int row2, int col1, int col2, bool choice, bool back, string title, string msg)
+{
+    DRAW d;
+
+    int padding = 0;
+    padding = ((col2 - col1)/2) - (title.length()/2);
+    position(padding, row1+1);
+    printf(title);
+
+    d.hLine(col1+1, col2-1, row1+2, 218);
+
+    padding = (col2 - col1 - msg.length())/2;
+
+    if(choice) {
+        if(col2 > 25) {
+            position(col1 + padding, row2 - 3);
+            printf(msg);
+        } else {
+            position(col1 + padding, 18);
+            printf(msg);
+        }
+    }
+    if (!back) 
+    {
+        if(col2 > 25) {
+            padding = (col2 - col1 - 31)/2;
+            position(col1 + padding, row2 - 3);
+            printf("Press <Enter> to return HOME..");
+        } else {
+            padding = (col2 - col1 - 27)/2;
+            position(col1 + padding, 22);
+            printf("Press <Enter> to go back..");
+        }
+    }
+    else {
+        if(col2 > 25) {
+            padding = (col2 - col1 - 31)/2;
+            position(col1 + padding, row2 - 3);
+            printf("Press <Enter> to return HOME..");
+        } else {
+            padding = (col2 - col1 - 27)/2;
+            position(col1 + padding, 22);
+            printf("Press <Enter> to go back..");
+        }
+    }
+    d.box(col1, row1, col2, row2, 218);
+    d.vLine(row1+1, row2-1, col1+1, '*');
+    d.vLine(row1+1, row2-1, col2-1, '*');
+}
+
 // Function positions the cursor according to the co-ordinates
 void position(int x, int y)
 {
@@ -1267,6 +1342,7 @@ bool STUDENT::registerStudent()
 
     trim(firstName);
     trim(lastName);
+
     do
     {   
         position(70, 18);
@@ -1333,6 +1409,8 @@ bool STUDENT::showStudents()
 
     d.hLine(36, 76, 3, 196);
 
+    
+
     do
     {
         valid = 1;
@@ -1378,7 +1456,7 @@ void STUDENT::display(string file)
     int line = 4;
     position(40, 2);
     cout << "Roll No";
-    position(58, 2);
+    position(54, 2);
     cout << "Student Name";
     d.hLine(37, 80, 3, 196);
     
@@ -1386,7 +1464,7 @@ void STUDENT::display(string file)
         found = true;
         position(40, line);
         cout << rollno;
-        position(51, line);
+        position(54, line);
         cout << firstName << " " << lastName << "\n";
         line++;
     }
