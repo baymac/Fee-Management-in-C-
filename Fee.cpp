@@ -18,46 +18,6 @@
 #include <functional>
 
 using namespace std;
-
-// trim from start
-static inline std::string &ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))));
-    return s;
-}
-
-// trim from end
-static inline std::string &rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-    return s;
-}
-
-// trim from both ends
-static inline std::string &trim(std::string &s) {
-    return ltrim(rtrim(s));
-}
-
-void startAnimation();
-void homeAnimation();
-void home(bool &);
-void position(int, int);
-void customAnimation(int, int, int, int, bool, bool, string, string);
-void illegalChoice(int, int, int, int);
-
-string clear(int n) {
-    string clear;
-    while(n--) {
-        clear+= " ";
-    }
-    return clear;
-}
-// Global Variables
-char ch;
-int i, j, valid;
-string clear_s = "      ";
-COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
-
 // To draw lines, boxes
 class DRAW
 {
@@ -65,7 +25,237 @@ class DRAW
     void hLine(int, int, int, char);
     void vLine(int, int, int, char);
     void box(int, int, int, int, char);
-}d;
+} d;
+
+// This class contains all the essential functions and variables for fee management
+class FEE
+{
+  private:
+    int Class;
+    float tuition, library, lab, computer, activity;
+    void display(int);
+    void defaultFees(string);
+    FEE readFees(int);
+    void writeFees(int, FEE);
+    void getRevisedFees(FEE &);
+    void printSlip(int, string, string);
+
+  public:
+  void addDefault(void);
+    void setClass(int tclass) {
+        Class = tclass;
+    }
+    void setTuition(float ttuition) {
+        tuition = ttuition;
+    }
+    void setLibrary(float tlibrary) {
+        library = tlibrary;
+    }
+    void setLab(float tlab) {
+        lab = tlab;
+    }
+    void setComputer(float tcomputer) {
+        computer = tcomputer;
+    }
+    void setActivity(float tactivity) {
+        activity = tactivity;
+    }
+    bool feeStructure(void);
+    bool modifyFees(void);
+    bool feeSlip(void);
+    void showHelp(void);
+} fee;
+
+class STUDENT 
+{
+    private:
+      int Class;
+      string rollno, firstName, lastName;
+      int display(int);
+      int search(string, string, int);
+      void registrationSuccess(int);
+
+    public:
+      void secondaryRegistration(int);
+      bool studentFind(int, string);
+      bool registerStudent(void);
+      bool searchStudent(bool &);
+      void flushStudents();
+      bool listByClass();
+      bool searchByRoll();
+      bool searchByName();
+      bool deleteStudent();
+} s;
+
+
+// Global Variables
+char ch;
+int i, j, valid;
+string clear_s = "      ";
+COORD coord = {0, 0}; // Defines the coordinates of a character cell in a console screen buffer
+
+void startAnimation();
+void homeAnimation();
+void customAnimation(int, int, int, int, bool, bool, string, string);
+void home(bool &);
+bool illegalChoice(int, int, int, int);
+void insertFees(int, float, float, float, float, float, FEE);
+int getClass(int, int, int, int);
+int getFees(int, int, int, int, int &);
+string getRoll(int, int, int, int);
+string getName(int, int, int, int);
+
+// Function positions the cursor according to the co-ordinates
+static inline void position(int x, int y)
+{
+    COORD coord = {x, y}; // coord is a structure defined in windows.h
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+// trim from start
+static inline string &ltrim(string &s) {
+    s.erase(s.begin(), find_if(s.begin(), s.end(),
+            not1(ptr_fun<int, int>(isspace))));
+    return s;
+}
+
+// trim from end
+static inline string &rtrim(string &s) {
+    s.erase(find_if(s.rbegin(), s.rend(),
+            not1(ptr_fun<int, int>(isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline string &trim(string &s) {
+    return ltrim(rtrim(s));
+}
+
+static inline string clear(int n) {
+    string clear;
+    while(n--) {
+        clear+= " ";
+    }
+    return clear;
+}
+
+// Function to insert the fee structure into the file
+void insertFees(int tclass, float ttuition, float tlibrary,
+                      float tlab, float tcomputer, float tactivity, FEE f)
+{
+    ofstream file;
+
+    file.open("FEE.TXT", ios::app);
+    if (file.fail())
+    {
+        exit(0);
+    }
+
+    f.setClass(tclass);
+    f.setTuition(ttuition);
+    f.setLibrary(tlibrary);
+    f.setLab(tlab);
+    f.setComputer(tcomputer);
+    f.setActivity(tactivity);
+
+    file.write((char *)&f, sizeof(FEE));
+
+    file.close();
+}
+
+int getClass(int col1, int row1, int col2, int row2) 
+{
+    int valid = 0;
+    char input[3]; 
+    int tclass;
+    do
+    {
+        valid = 1;
+        position(col1, row1);
+        gets(input);
+        tclass = atoi(input);
+
+        if (strlen(input) == 0)
+            return 0;
+
+        if(*input == 'd' | *input == 'D') {
+            return 71;
+        }
+
+        if (tclass < 1 || tclass > 12)
+        {
+            valid = 0;
+            position(col2, row2);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(col1, row1);
+            cout << clear(8);
+        }
+    } while (!valid);
+    
+    position(37, 18);
+    cout << clear(40);
+    return tclass;
+}
+
+string getRoll(int col1, int row1, int col2, int row2)
+{   
+    string roll;
+    int valid = 0;
+    do
+    {
+        valid = 1;
+        position(col1, row1);        
+        getline(cin, roll);
+        if(roll.length() == 0) 
+        {
+            return "";
+        }
+
+        if (roll.length() >= 10)
+        {
+            valid = 0;
+            position(col2, row2);
+            cout << "Wrong Value Entered, Please Enter Again";
+            position(col1, row1);
+            cout << clear(20);
+        }
+    } while (!valid);
+
+    position(col2, row2);
+    cout << clear(40);
+    return roll;
+}
+
+string getName(int col1, int row1, int col2, int row2)
+{   
+    int valid = 0;
+    string name;
+    do
+    {
+        valid = 1;
+        position(col1, row1);
+        cout << clear(30);
+        position(col1, row1);
+        getline(cin, name);
+
+        if (name.length() == 0) {
+            return "";
+        }
+        if (name.length() < 2)
+        { 
+            valid = 0;
+            position(col2, row2);
+            cout << "Please Enter a valid Name";
+            position(col1, row1);
+            cout << clear(20);
+        }
+    } while (!valid);
+
+    position(col2, row2);
+    cout << clear(26);
+    return name;
+}
+ 
 
 // Draws a horizontal line between 2 points
 void DRAW::hLine(int column1, int column2, int row, char c)
@@ -131,41 +321,6 @@ void DRAW::box(int column1, int row1, int column2, int row2, char c)
     vLine(row1, row2, column2, l2);
 }
 
-// This class contains all the essential functions and variables for fee management
-class FEE
-{
-  private:
-    int Class;
-    float tuition, library, lab, computer, activity;
-    void display(int);
-    void insertFees(int, float, float, float, float, float);
-
-  public:
-    void addDefault(void);
-    bool modifyFees(void);
-    bool feeSlip(void);
-    bool feeStructure(void);
-    void showHelp(void);
-} fee;
-
-class STUDENT 
-{
-    private:
-      int Class;
-      string rollno, firstName, lastName;
-      int display(int);
-      int search(string, string, int);
-    public:
-      bool studentFind(int, string);
-      bool registerStudent(void);
-      bool searchStudent(bool &);
-      void flushStudents();
-      bool listByClass();
-      bool searchByRoll();
-      bool searchByName();
-      bool deleteStudent();
-} s;
-
 // Function to add default values of fee structure
 void FEE::addDefault(void)
 {
@@ -174,42 +329,18 @@ void FEE::addDefault(void)
     file.open("FEE.TXT", ios::out | ios::trunc);
     file.close();
 
-    insertFees(1, 250, 50, 0, 40, 40);
-    insertFees(2, 250, 50, 0, 40, 40);
-    insertFees(3, 250, 50, 0, 40, 40);
-    insertFees(4, 250, 50, 0, 40, 40);
-    insertFees(5, 250, 50, 0, 40, 40);
-    insertFees(6, 300, 50, 20, 40, 50);
-    insertFees(7, 300, 50, 20, 40, 50);
-    insertFees(8, 300, 50, 20, 40, 50);
-    insertFees(9, 350, 50, 20, 60, 50);
-    insertFees(10, 350, 50, 30, 60, 50);
-    insertFees(11, 450, 50, 60, 60, 50);
-    insertFees(12, 450, 50, 60, 60, 50);
-}
-
-// Function to insert the fee structure into the file
-void FEE::insertFees(int tclass, float ttuition, float tlibrary,
-                      float tlab, float tcomputer, float tactivity)
-{
-    ofstream file;
-
-    file.open("FEE.TXT", ios::app);
-    if (file.fail())
-    {
-        exit(0);
-    }
-
-    Class = tclass;
-    tuition = ttuition;
-    library = tlibrary;
-    lab = tlab;
-    computer = tcomputer;
-    activity = tactivity;
-
-    file.write((char *)this, sizeof(FEE));
-
-    file.close();
+    insertFees(1, 250, 50, 0, 40, 40, *this);
+    insertFees(2, 250, 50, 0, 40, 40, *this);
+    insertFees(3, 250, 50, 0, 40, 40, *this);
+    insertFees(4, 250, 50, 0, 40, 40, *this);
+    insertFees(5, 250, 50, 0, 40, 40, *this);
+    insertFees(6, 300, 50, 20, 40, 50, *this);
+    insertFees(7, 300, 50, 20, 40, 50, *this);
+    insertFees(8, 300, 50, 20, 40, 50, *this);
+    insertFees(9, 350, 50, 20, 60, 50, *this);
+    insertFees(10, 350, 50, 30, 60, 50, *this);
+    insertFees(11, 450, 50, 60, 60, 50, *this);
+    insertFees(12, 450, 50, 60, 60, 50, *this);
 }
 
 
@@ -294,37 +425,12 @@ bool FEE::feeStructure()
 
     file.close();
 
-    char input[3];
     int tclass;
-    int padding = 0;
-    do
-    {
-        valid = 1;
-        position(55, 26);
-        gets(input);
-        tclass = atoi(input);
 
-        if (tclass < 1 || tclass > 12)
-        {
-            valid = 0;
-        }
-
-        if (strlen(input) == 0)
-        {
-            return false;
-        }
-        
-        if (!valid)
-        {   
-            position(36, 20);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(55, 26);
-            cout << clear(8);
-        }
-
-    } while (!valid);
-
-    trim(string(input));
+    tclass = getClass(55, 26, 36, 20);
+    if(tclass == 0) {
+        return false;
+    }
 
     system("cls");
      
@@ -337,109 +443,70 @@ bool FEE::feeStructure()
     return true;
 }
 
-// Function to modify fee structure of a given class
-bool FEE::modifyFees(void)
+int getFees(int col1, int row1, int col2, int row2, int &modified) 
 {
-    system("cls");
-
-    string title = "MODIFY FEES";
-    customAnimation(29, 1, 83, 25, false, false, title, "");
-
-    char input[5];
-    int tclass = 0;
-
-    position(40, 22);
-    cout << "Enter <d> to enter default fees";
-    
-
+    int valid = 0;
+    char input[3]; 
+    float feeVal;
     do
     {
         valid = 1;
-        position(35, 5);
-        cout << "Class : ";
+        position(col1, row1);
         gets(input);
-        if(*input == 'd' | *input == 'D')
-        {
-            system("cls");
-            customAnimation(29, 1, 83, 25, false, true, title, "");
-        
-            addDefault();
-
-            position(44, 5);
-            cout << "All fees set to default.";
-            position(69, 24);
-            getch();
-            return true;
-        }
-        tclass = atoi(input);
+        feeVal = atof(input);
 
         if (strlen(input) == 0)
-        {
-            return false;
-        }
-        
-        if (tclass < 1 || tclass > 12)
+            modified++;
+            break;
+
+        if (feeVal > 1000)
         {
             valid = 0;
         }
 
         if (!valid)
         {
-            position(36, 20);
+            position(col2, row2);
             cout << "Wrong Value Entered, Please Enter Again";
-            position(43, 5);
-            cout << clear(5);
+            position(col1, row1);
+            cout << clear(8);
         }
-
     } while (!valid);
+    
+    position(col2, row2);
+    cout << clear(40);
+    return feeVal;
+}
 
-    system("cls");
-    title = "MODIFY FEES";
-    string msg = "Do you want to modify the fee structure (y/n)";
-
-    customAnimation(29, 1, 83, 25, true, true, title, msg);
-
-    display(tclass);
-
-    Class = tclass;
-
+char yesno(int col1, int row1)
+{
+    char ch;
     do
     {
-        position(55, 24);
+        position(col1, row1);
         cout << clear(4);
-        position(55, 24);
+        position(col1, row1);
         ch = getch();
-        if(ch == '\n' || isspace(ch)) {
-            return true;
-        }
         cout << ch;
         getch();
         ch = toupper(ch);
-    } while (ch != 'N' && ch != 'Y');
+    } while (ch != 'N' && ch != 'Y' && ch == '\n' && isspace(ch));
+    return ch;
+}
 
-    if (ch == 'N')
-        return true;
+void FEE::defaultFees(string title) {
+    system("cls");
+    customAnimation(29, 1, 83, 25, false, true, title, "");
 
-    float ttuition = 0.0, tlibrary = 0.0, tlab = 0.0, tcomputer = 0.0, tactivity = 0.0;
-    position(31, 20);
-    cout << clear(50);
-    position(31, 22);
-    cout << clear(50);
-    position(55, 24);
-    cout << clear(1);
+    addDefault();
 
-    position(43, 16);
-    cout << "Revised Tuition Fees  : ";
-    position(43, 17);
-    cout << "Revised Library Fees  : ";
-    position(43, 18);
-    cout << "Revised Lab Fees      : ";
-    position(43, 19);
-    cout << "Revised Computer Fees : ";
-    position(43, 20);
-    cout << "Revised Activity Fees : ";
+    position(44, 5);
+    cout << "All fees set to default.";
+    position(69, 24);
+    getch();
+}
 
-    int modified = 5;
+FEE FEE::readFees(int tclass) {
     fstream file;
     file.open("FEE.TXT", ios::out | ios::in);
 
@@ -452,237 +519,16 @@ bool FEE::modifyFees(void)
         file.seekp(((tclass - 1) * sizeof(FEE)) + 1);
     }
 
-    file.read((char *)&fee, sizeof(FEE));
+    file.read((char *)this, sizeof(FEE));
+    file.close();
+    return *this;
+}
 
-    position(38, 23);
-    cout << "Press Enter to keep this fee unmodified";
-    do
-    {
-        valid = 1;
-
-        position(67, 16);
-        gets(input);
-        ttuition = atof(input);
-
-        if (strlen(input) == 0){
-            modified++;
-            break;
-        }
-            
-        if (ttuition > 1000)
-        {
-            valid = 0;
-        }
-
-        if (!valid)
-        {
-            position(38, 24);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(67, 16);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(38, 24);
-    cout << clear(40);
-
-    modified--;
-    if(modified < 5){
-        tuition = ttuition;
-    } else {
-        position(67, 16);
-        cout << fee.tuition;
-        tuition = fee.tuition;
-        modified--;
-    }
-
-    do
-    {
-        valid = 1;
-
-        position(67, 17);
-        gets(input);
-        tlibrary = atof(input);
-
-        if (strlen(input) == 0)
-        {
-            modified++;
-            break;
-        }
-
-        if (tlibrary > 1000)
-        {
-            valid = 0;
-        }
-
-        if (!valid)
-        {
-            position(38, 24);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(67, 17);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(38, 24);
-    cout << clear(40);
-    modified--;
-    if(modified < 4)
-    {
-        library = tlibrary;
-    } else {
-        position(67, 17);
-        cout << fee.library;
-        library = fee.library;
-        modified--;
-    }
-
-    do
-    {
-        valid = 1;
-
-        position(67, 18);
-        gets(input);
-        tlab = atof(input);
-
-        if (strlen(input) == 0)
-        {
-            modified++;
-            break;
-        }
-
-        if (tlab > 1000)
-        {
-            valid = 0;
-        }
-
-        if (!valid)
-        {
-            position(38, 24);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(67, 18);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(38, 24);
-    cout << clear(40);
-    modified--;
-    if(modified < 3)
-    {
-        lab = tlab;
-    } else {
-        position(67, 18);
-        cout << fee.lab;
-        lab = fee.lab;
-        modified--;
-    }
-
-    do
-    {
-        valid = 1;
-
-        position(67, 19);
-        gets(input);
-        tcomputer = atof(input);
-
-        if (strlen(input) == 0)
-        {
-            modified++;
-            break;
-        }
-
-        if (tcomputer > 1000)
-        {
-            valid = 0;
-        }
-
-        if (!valid)
-        {
-            position(38, 24);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(67, 19);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(38, 24);
-    cout << clear(40);
-    modified--;
-    if(modified < 2)
-    {
-        computer = tcomputer;
-    } else {
-        position(67, 19);
-        cout << fee.computer;
-        computer = fee.computer;
-        modified--;
-    }
-
-    do
-    {
-        valid = 1;
-        position(67, 20);
-        gets(input);
-        tactivity = atof(input);
-
-        if (strlen(input) == 0)
-        {
-            modified++;
-            break;
-        }
-
-
-        if (tactivity > 1000)
-        {
-            valid = 0;
-        }
-
-        if (!valid)
-        {
-            position(38, 24);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(67, 20);
-            cout << clear_s;
-        }
-    } while (!valid);
-
-    position(38, 24);
-    cout << clear(40);
-    modified--;
-    if(modified < 1)
-    {
-        activity = tactivity;
-    } else {
-        position(67, 20);
-        cout << fee.activity;
-        activity = fee.activity;
-        modified--;
-    }
-
-    position(32, 23);
-    cout << clear(50);
-
-    do
-    { 
-        position(70, 23);
-        cout << clear(5); 
-        position(40, 23);
-        cout << "Do you want to save this (y/n) : ";
-        ch = getch();
-        cout << ch;
-        ch = toupper(ch);
-        getch();
-    } while (ch != 'N' && ch != 'Y');
-
-    if (ch == 'N')
-    {
-        return true;
-    }
-
-    if (ch == 'Y')
-    {
-        if (tclass <= 10)
+void FEE::writeFees(int tclass, FEE f) 
+{
+    fstream file;
+    file.open("FEE.TXT", ios::out | ios::in);
+    if (tclass <= 10)
         {
             file.seekp((tclass - 1) * sizeof(FEE));
         }
@@ -690,8 +536,155 @@ bool FEE::modifyFees(void)
         {
             file.seekp(((tclass - 1) * sizeof(FEE)) + 1);
         }
-        file.write((char *)this, sizeof(FEE));
+        file.write((char *)&f, sizeof(FEE));
         file.close();
+}
+
+void FEE::getRevisedFees(FEE &f)
+{   
+    float ttuition = 0.0, tlibrary = 0.0, tlab = 0.0, tcomputer = 0.0, tactivity = 0.0;
+
+    int modified = 5;
+
+    position(43, 16);
+    cout << "Revised Tuition Fees  : ";
+    position(43, 17);
+    cout << "Revised Library Fees  : ";
+    position(43, 18);
+    cout << "Revised Lab Fees      : ";
+    position(43, 19);
+    cout << "Revised Computer Fees : ";
+    position(43, 20);
+    cout << "Revised Activity Fees : ";
+
+    position(38, 23);
+    cout << "Press Enter to keep this fee unmodified";
+
+    ttuition = getFees(67, 16, 38, 24, modified);
+
+    modified--;
+    if(modified < 5){
+        f.tuition = ttuition;
+    } else {
+        position(67, 16);
+        cout << f.tuition;
+        modified--;
+    }
+    
+    tlibrary = getFees(67, 17, 38, 24, modified);
+    
+    modified--;
+    if(modified < 4)
+    {
+        f.library = tlibrary;
+    } else {
+        position(67, 17);
+        cout << f.library;
+        modified--;
+    }
+
+    tlab = getFees(67, 18, 38, 24, modified);
+    modified--;
+    if(modified < 3)
+    {
+        f.lab = tlab;
+    } else {
+        position(67, 18);
+        cout << f.lab;
+        modified--;
+    }
+
+    tcomputer = getFees(67, 19, 38, 24, modified);
+    modified--;
+    if(modified < 2)
+    {
+        f.computer = tcomputer;
+    } else {
+        position(67, 19);
+        cout << f.computer;
+        modified--;
+    }
+
+    tactivity = getFees(67, 20, 38, 24, modified);
+    
+    modified--;
+    if(modified < 1)
+    {
+        f.activity = tactivity;
+    } else {
+        position(67, 20);
+        cout << f.activity;
+        modified--;
+    }
+
+    position(32, 23);
+    cout << clear(50);
+}
+
+// Function to modify fee structure of a given class
+bool FEE::modifyFees(void)
+{
+    system("cls");
+
+    string title = "MODIFY FEES";
+    customAnimation(29, 1, 83, 25, false, false, title, "");
+
+    int tclass = 0;
+    char ch ='N';
+
+    position(40, 22);
+    cout << "Enter <d> to enter default fees";
+    
+    position(35, 5);
+    cout << "CLASS : ";
+
+    tclass = getClass(43, 5, 36, 20);
+    
+    if(tclass == 71)
+    {
+        defaultFees(title);
+        return true;
+    } else if(tclass == 0) {
+        return false;
+    }
+    
+    *this = readFees(tclass);
+
+    system("cls");
+    title = "MODIFY FEES";
+    string msg = "Do you want to modify the fee structure (y/n)";
+
+    customAnimation(29, 1, 83, 25, true, true, title, msg);
+
+    display(tclass);
+
+    ch = yesno(55, 24);
+    
+    if(ch == '\n' || isspace(ch) || ch == 'N') {
+        return true;
+    }
+    
+    position(31, 20);
+    cout << clear(50);
+    position(31, 22);
+    cout << clear(50);
+    position(55, 24);
+    cout << " ";
+    
+    getRevisedFees(*this);
+
+    position(40, 23);
+    cout << "Do you want to save this (y/n) : ";
+    
+    ch = yesno(73, 23);
+    
+    if(ch == '\n' || isspace(ch) || ch == 'N') {
+        return true;
+    }
+
+    if (ch == 'Y')
+    {
+        writeFees(tclass, *this);
     }
 
     system("cls");  
@@ -717,9 +710,8 @@ bool FEE::feeSlip(void)
     string title = "FEE SLIP";
     customAnimation(29, 1, 83, 25, false, false, title, "");
 
-    char input[3];
     int tclass = 0;
-    float total = 0;
+    char ch;
 
     position(37, 5);
     cout << "CLASS        : ";
@@ -727,81 +719,55 @@ bool FEE::feeSlip(void)
     position(37, 7);
     cout << "STUDENT NAME : ";
 
-    do
+    tclass = getClass(52, 5, 36, 22);
+
+    if(tclass == 0) 
     {
-        valid = 1;
-        position(52, 5);
-        gets(input);
-        tclass = atoi(input);
-        Class = tclass;
-        
-        if (strlen(input) == 0)
-            return false;
-
-        if (tclass < 1 || tclass > 12)
-        {
-            valid = 0;
-            position(38, 22);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(52, 5);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(38, 22);
-    cout << clear(40);
+        return false;
+    }
 
     string name;
 
-    do
+    name = getName(52, 7, 43, 22);
+
+    if (name.length() == 0) 
     {
-        valid = 1;
-        position(52, 7);
-        getline(cin, name);
-        if (name.length() == 0) {
-            return false;
-        }
-        else if (!s.studentFind(tclass, name))
-        {
-            valid = 0;
-            position(40, 20);
-            cout << "Name is not registered with us";
-            do
-            {   
-                position(87, 22);
-                cout << " ";
-                position(33, 22);
-                cout << "Do you want to register the student (y/n) : ";
-                ch = getch();
-                cout << ch;
-                ch = toupper(ch);
-                getch();
-            } while (ch != 'N' && ch != 'Y');
+        return false;
+    }
+    
+    if (!s.studentFind(tclass, name))
+    {
+        s.secondaryRegistration(20);
+        return true;;
+    }
+    
+    printSlip(tclass, name, title);
 
-            bool b = true;
-            if (ch == 'Y')
-            {
-                while(b)
-                {
-                    b = s.registerStudent();
-                }
-                return true;
-            }
-            position(52, 7);
-            cout << clear(25);
-            position(40, 20);
-            cout << clear(31);
-            position(33, 22);
-            cout << clear(47);
-        }
-    } while (!valid);
+    return true;
+}
 
+void STUDENT::secondaryRegistration(int line) 
+{
+    position(40, line);
+    cout << "Name is not registered with us";
+    position(33, line+2);
+    cout << "Do you want to register the student (y/n) : ";
+    ch = yesno(77, line+2);
+    if (ch == 'Y')
+    {
+        bool b = registerStudent();
+        
+    }
+}
+void FEE::printSlip(int tclass, string name, string title) 
+{
     system("cls");
 
     int line = 5;
+    float total = 0;
 
     customAnimation(29, 1, 83, 30, false, true, title, "");
-    
+
     d.box(36, line++, 77, 27, 989);
 
     int d1, m1, y1;
@@ -847,10 +813,8 @@ bool FEE::feeSlip(void)
 
     while (file.read((char *)this, sizeof(FEE)))
     {
-
         if (Class == tclass)
         {
-
             total = 0.0;
 
             position(39, ++line);
@@ -874,7 +838,6 @@ bool FEE::feeSlip(void)
             total = total + activity;
         }
     }
-
     file.close();
 
     d.vLine(12, 24, 62, 179);
@@ -884,9 +847,7 @@ bool FEE::feeSlip(void)
 
     position(69, 29);
     getch();
-    return true;
 }
-
 // Function to proovide help
 void FEE::showHelp()
 {
@@ -965,7 +926,6 @@ void home(bool &ill)
             break;
 
         case '4':
-            ill = false;
             while(back){
                 back = s.searchStudent(ill);
             }
@@ -992,17 +952,17 @@ void home(bool &ill)
             break;
 
         default:
-            illegalChoice(29, 1, 85, 25);
-            ill = true;
+            ill = illegalChoice(29, 1, 85, 25);
     }
 }
 
-void illegalChoice(int col1, int row1, int col2, int row2) {
+bool illegalChoice(int col1, int row1, int col2, int row2) {
     position(col1 + 2, row2 - 1);
     cout << clear(50);
     int padding = (col2 - col1 - 16) / 2;
     position(col1 + padding, row2 - 7);
-    cout << "ILLEGAL CHOICE!!";  
+    cout << "ILLEGAL CHOICE!!";
+    return true;  
 }
 
 // Main Function from the program runs
@@ -1086,19 +1046,19 @@ void homeAnimation()
     d.hLine(35, 77, 3, 218);
 
     position(35, 5);
-    printf("1: Fees Structure");
+    printf("1: FEES STRUCTURE");
 
     position(35, 7);
-    printf("2: Fee Slip");
+    printf("2: FEE SLIP");
 
     position(35, 9);
-    printf("3: Student Registration");
+    printf("3: STUDENT REGISTRATION");
 
     position(35, 11);
-    printf("4: Search Students");
+    printf("4: SEARCH STUDENTS");
 
     position(35, 13);
-    printf("5: Modify Fees");
+    printf("5: MODIFY FEES");
     
     position(70, 5);
     printf("H: HELP");
@@ -1123,7 +1083,7 @@ void customAnimation(int col1, int row1, int col2, int row2, bool choice, bool b
     if(choice == false){
         offset += 4;
     }
-    padding = ((col2 - col1)/2) - (title.length()/2);
+    padding = (col2 - col1 - title.length()) / 2;
     position(col1+padding, row1+1);
     cout << title;
 
@@ -1166,27 +1126,17 @@ void customAnimation(int col1, int row1, int col2, int row2, bool choice, bool b
         }
     }
 }
-// Function positions the cursor according to the co-ordinates
-void position(int x, int y)
-{
-    COORD coord = {x, y}; // coord is a structure defined in windows.h
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
 
-bool STUDENT::studentFind(int tclass, string studentName)
+bool STUDENT::studentFind(int tclass, string info)
 {
     stringstream nm;
-    nm << tclass;
-    string classString;
-    nm >> classString;
-    string fileLookup = "Students\\CLASS" + classString + ".TXT";
+ 
+    char fileLookup[25];
+    sprintf(fileLookup,"Students\\CLASS%d.TXT", tclass);
     fstream tt;
-    tt.open(fileLookup.c_str(), ios::in);
-    
-    nm.clear();
-    nm.str(string());
+    tt.open(fileLookup, ios::in);
 
-    nm << studentName;
+    nm << info;
     string fName, lName;
     nm >> fName;
     nm >> lName;
@@ -1211,11 +1161,6 @@ bool STUDENT::registerStudent()
     string title = "STUDENT REGISTRATION";
     customAnimation(29, 1, 83, 25, false, false, title, "");
 
-
-    int tclass;
-    char input[3];
-    int valid = 1;
-
     position(35, 5);
     cout << "CLASS      : ";
 
@@ -1227,98 +1172,28 @@ bool STUDENT::registerStudent()
 
     position(35, 11);
     cout << "LAST NAME  : ";
+    
+    Class = getClass(49, 5, 36, 22);
+    if(Class == 0) {
+        return false;
+    }
 
-    do
-    {
-        valid = 1;
-        position(49, 5);
-        gets(input);
-        tclass = atoi(input);
-        Class = tclass;
+    rollno = getRoll(49, 7, 36, 22);
+    if(rollno.length() == 0) {
+        return false;
+    }
 
-        if (strlen(input) == 0)
-            return false;
-
-        if (tclass < 1 || tclass > 12)
-        {
-            valid = 0;
-            position(36, 22);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(49, 5);
-            cout << clear(8);
-        }
-    } while (!valid);
-
-    position(36, 22);
-    cout << clear(40);
-
-    do
-    {
-        valid = 1;
-        position(49, 7);        
-        getline(cin, rollno);
-        if(strlen(rollno.c_str()) == 0) 
-        {
+    do{
+        firstName = getName(49, 9, 43, 22);
+        if(firstName.length() == 0) {
             return false;
         }
-
-        if (strlen(rollno.c_str()) >= 10)
-        {
-            valid = 0;
-            position(36, 22);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(49, 7);
-            cout << clear(20);
-        }
-    } while (!valid);
-
-    position(36, 22);
-    cout << clear(40);
-
-    do
-    {
-        valid = 1;
-        position(49, 9);
-        getline(cin, firstName);
-
-        if (firstName.length() == 0) {
+        lastName = getName(49, 11, 43, 22);
+        if(lastName.length() == 0) {
             return false;
         }
-        if (firstName.length() < 2)
-        { 
-            valid = 0;
-            position(43, 22);
-            cout << "Please Enter a valid Name";
-            position(49, 9);
-            cout << clear(20);
-        }
-    } while (!valid);
-
-    position(43, 22);
-    cout << clear(26);
-
-    do
-    {
-        valid = 1;
-        position(49, 11);
-        getline(cin, lastName);
-
-        if (lastName.length() == 0) {
-            return false;
-        }
-        if (lastName.length() < 2 || (lastName.length() + firstName.length()) >= 46)
-        { 
-            valid = 0;
-            position(43, 22);
-            cout << "Please Enter a valid Name";
-            position(49, 11);
-            cout << clear(20);
-        }
-    } while (!valid);
-
-    position(43, 22);
-    cout << clear(26);
-
+    } while((lastName.length() + firstName.length()) >= 46);
+    
     trim(firstName);
     trim(lastName);
 
@@ -1340,36 +1215,37 @@ bool STUDENT::registerStudent()
     }
 
     if (ch == 'Y')
-    {
-        stringstream nm;
-        nm << tclass;
-        string classString;
-        nm >> classString;
-        string fileLookup = "Students\\CLASS" + classString + ".TXT";
-        fstream tt;
-        tt.open(fileLookup.c_str(), ios::app);
-        tt.write((char *)this, sizeof(STUDENT));
-        tt.close();
-
+    {   
         system("cls");
-        
         customAnimation(29, 1, 83, 25, false, true, title, "");
-        position(44, 5);
-        cout << "Registration Successful!";
-        position(48, 10);
-        cout << "Congratulations!";
-        int padding = (54 - (firstName.length() + lastName.length() + 1))/2;
-        position(29 + padding, 12);
-        cout << firstName << " " << lastName;
-        position(40, 14);
-        cout << "You are now registered with us.";
-        padding = (54 - (11 + rollno.length() ) )/2;
-        position(29 + padding, 16);
-        cout << "ROLL NO : " << rollno;
-        position(69, 24);
-        getch();
+        registrationSuccess(Class);    
     }
     return true;
+}
+
+void STUDENT::registrationSuccess(int tclass) 
+{
+    char fileLookup[25];
+    sprintf(fileLookup,"Students\\CLASS%d.TXT", tclass);
+    fstream tt;
+    tt.open(fileLookup, ios::app);
+    tt.write((char *)this, sizeof(STUDENT));
+    tt.close();
+
+    position(44, 5);
+    cout << "Registration Successful!";
+    position(48, 10);
+    cout << "Congratulations!";
+    int padding = (54 - (firstName.length() + lastName.length() + 1))/2;
+    position(29 + padding, 12);
+    cout << firstName << " " << lastName;
+    position(40, 14);
+    cout << "You are now registered with us.";
+    padding = (54 - (11 + rollno.length() ) )/2;
+    position(29 + padding, 16);
+    cout << "ROLL NO : " << rollno;
+    position(69, 24);
+    getch();
 }
 
 bool STUDENT::searchStudent(bool &ill) 
@@ -1394,7 +1270,6 @@ bool STUDENT::searchStudent(bool &ill)
         position(48, 18);
         cout << "ILLEGAL CHOICE!!";
     }
-   
 
     position(55, 24);    
     ch = getch();
@@ -1424,8 +1299,7 @@ bool STUDENT::searchStudent(bool &ill)
             }
             break;
         default:
-            illegalChoice(29, 1, 83, 25);
-            ill = true;
+            ill = illegalChoice(29, 1, 83, 25);
     }
     return true;
 }
@@ -1439,38 +1313,20 @@ bool STUDENT::listByClass()
 
     customAnimation(29, 1, 83, 25, true, true, title, msg);
 
-    int tclass;
-    char input[3];
-    int valid = 1;
+    position(35, 5);
+    cout << "CLASS : ";
 
-    do
-    {
-        valid = 1;
-        position(35, 5);
-        cout << "CLASS : ";
-        gets(input);
-        tclass = atoi(input);
+    int tclass = getClass(43, 5, 36, 18);
 
-        if (strlen(input) == 0)
-            return false;
+    if(tclass == 0) {
+        return false;
+    }
 
-        if (tclass < 1 || tclass > 12)
-        {
-            valid = 0;
-            position(37, 18);
-            cout << "Wrong Value Entered, Please Enter Again";
-            position(58, 5);
-            cout << clear(5);
-        }
-    } while (!valid);
-
-    stringstream nm;
-    nm << tclass;
-    string classString;
-    nm >> classString;
-    string fileLookup = "Students\\CLASS" + classString + ".TXT";
+    char fileLookup[25];
+    sprintf(fileLookup, "Students\\CLASS%d.TXT", tclass);
+    
     fstream tt;
-    tt.open(fileLookup.c_str());
+    tt.open(fileLookup);
     
     system("cls");
     
@@ -1482,14 +1338,15 @@ bool STUDENT::listByClass()
     while(tt.read((char *)this, sizeof(STUDENT))) {
         position(35, line);
         cout << rollno;
-        position(50, line);
+        position(50, line++);
         cout << firstName << " " << lastName;
-        line++;
     }
+
     if(line == 9) {
         position(35, 9);
         cout << "No Records Found!";
     }
+    
     if(line > 17){
         customAnimation(29, 1, 83, 25 + (line - 17), false, true, title, "");
         position(35, 5);
@@ -1516,15 +1373,13 @@ bool STUDENT::searchByRoll() {
 
     string roll;
 
-    do
-    {
-        valid = 1;
-        position(35, 5);
-        cout << "ROLL NO : ";
-        getline(cin, roll);
-        if (roll.length() == 0)
-            return false;
-    } while (!valid);
+    position(35, 5);
+    cout << "ROLL : ";
+
+    roll = getRoll(43, 5, 36, 18);
+
+    if (roll.length() == 0)
+        return false;
     
     int line = 7;
 
@@ -1552,16 +1407,16 @@ bool STUDENT::searchByName() {
     system("cls");
 
     string title = "SEARCH BY NAME";
-    string msg = "Enter First Name to search for students";
+    string msg = "Enter Name to search for students";
 
     customAnimation(29, 1, 83, 25, true, true, title, msg);
 
-    string fName;
+    string name;
 
     position(35, 5);
-    cout << "First Name : ";
-    getline(cin, fName);
-    if (fName.length() == 0){
+    cout << "Name : ";
+    name = getName(43, 5, 36, 18);
+    if (name.length() == 0){
         return false;
     }
 
@@ -1569,18 +1424,18 @@ bool STUDENT::searchByName() {
 
     int line = 7;
 
-    line = search("name", fName, line);
+    line = search("name", name, line);
 
     if(line > 21) {
         customAnimation(29, 1, 83, 23 + (line - 21), false, true, title, "");
         position(35, 5);
-        cout << "Search Results for : " << fName;
+        cout << "Search Results for : " << name;
         position(68, 22 + (line - 21));
         getch();
     } else {
         customAnimation(29, 1, 83, 25, false, true, title, msg);
         position(35, 5);
-        cout << "Search Results for : " << fName;
+        cout << "Search Results for : " << name;
         position(68, 24);
         getch();
     }
@@ -1591,47 +1446,59 @@ bool STUDENT::searchByName() {
 int STUDENT::search(string type, string info, int line) {
     int tclass = 1;
     bool found = false;
+    char fileLookup[25];
     stringstream nm;
-    if(strcmpi(type.c_str(), "roll") == 0){
-        
+
+    if(strcmpi(type.c_str(), "roll") == 0)
+    {    
         while(tclass <= 12) 
         {
-            nm << tclass;
-            string classString;
-            nm >> classString;
-            string fileLookup = "Students\\CLASS" + classString + ".TXT";
-            fstream tt(fileLookup.c_str());
+            sprintf(fileLookup, "Students\\CLASS%d.TXT",tclass);
+            fstream tt(fileLookup);
             
-            while(tt.read((char *)this, sizeof(STUDENT))) {
-                if(strcmpi(rollno.c_str(), info.c_str()) == 0) {
+            while(tt.read((char *)this, sizeof(STUDENT))) 
+            {
+                if(strcmpi(rollno.c_str(), info.c_str()) == 0) 
+                {
                     if(found == false) {
                         position(35, line);
+                        found = true;
                     }
                     line = display(line++);
-                    found = true;
                 }
             }
-            tt.close();
-            nm.clear();
-            nm.str(string());
             tclass++;
         }
-    } else if(strcmpi(type.c_str(), "name") == 0) {
+    } else if(strcmpi(type.c_str(), "name") == 0) 
+    {
         while(tclass <= 12) 
         {
-            nm << tclass;
-            string classString;
-            nm >> classString;
-            string fileLookup = "Students\\CLASS" + classString + ".TXT";
-            fstream tt(fileLookup.c_str());
-            
-            while(tt.read((char *)this, sizeof(STUDENT))) {
-                if(strcmpi(firstName.c_str(), info.c_str()) == 0) {
-                    if(found == false) {
-                        position(35, line);
+            nm << info;
+            string fName, lName;
+            nm >> fName;
+            nm >> lName;
+
+            sprintf(fileLookup,"Students\\CLASS%d.TXT", tclass);
+            fstream tt(fileLookup);
+
+            if(lName != "\0") 
+            {
+                while (tt.read((char *)this, sizeof(STUDENT)))
+                {
+                    if (strcmpi((firstName + " " + lastName).c_str(), (fName + " " + lName).c_str()) == 0)
+                    {
+                        line = display(line++);
+                        found = true;
                     }
-                    line = display(line++);
-                    found = true;
+                }
+            } else {
+                while(tt.read((char *)this, sizeof(STUDENT))) 
+                {
+                    if(strcmpi(firstName.c_str(), fName.c_str()) == 0) 
+                    {
+                        line = display(line++);
+                        found = true;
+                    }
                 }
             }
             tt.close();
@@ -1644,7 +1511,6 @@ int STUDENT::search(string type, string info, int line) {
         position(35, line);
         cout << "NOT FOUND!";
     } 
-    
     return line;
 }   
 
@@ -1668,17 +1534,12 @@ void STUDENT::flushStudents()
     customAnimation(29, 1, 83, 25, false, false, title, "");
     
     int tclass = 1;
-    stringstream nm;
+    char fileLookup[25];
     while(tclass <= 12) 
     {
-        nm << tclass;
-        string classString;
-        nm >> classString;
-        string fileLookup = "Students\\CLASS" + classString + ".TXT";
-        fstream tt(fileLookup.c_str(), ios::out | ios::trunc);
+        sprintf(fileLookup, "Students\\CLASS%d.TXT", tclass);
+        fstream tt(fileLookup, ios::out | ios::trunc);
         tt.close();
-        nm.clear();
-        nm.str(string());
         tclass++;
     }
 
